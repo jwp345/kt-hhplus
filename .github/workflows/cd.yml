@@ -70,7 +70,7 @@ jobs:
     - name: Add permission
       run: chmod +x gradlew
 
-    - name: Build with Gradle and Check ktLint
+    - name: Build with Gradle
       run: ./gradlew build -x test
 
     - name: Configure AWS credentials
