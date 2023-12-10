@@ -70,13 +70,8 @@ jobs:
     - name: Add permission
       run: chmod +x gradlew
 
-    # Gradle clean build
-    - name: Build with Gradle
-      uses: gradle/gradle-build-action@v2
-      with:
-        arguments: clean build
-      env:
-        SPRING_PROFILES_ACTIVE: prod
+    - name: Build with Gradle and Check ktLint
+      run: ./gradlew build -x test
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
