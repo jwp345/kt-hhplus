@@ -36,8 +36,7 @@ env:
   ECS_SERVICE: prod-application                  # set this to your Amazon ECS service name
   ECS_CLUSTER: prodCluster                 # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION: task-definition-production.json
-  CONTAINER_NAME: docker-test-prod           # set this to the name of the container in the
-                                               # containerDefinitions section of your task definition
+  CONTAINER_NAME: docker-test-prod
 
 permissions:
   contents: read
@@ -76,12 +75,13 @@ jobs:
         touch ./application-prod.yml
         echo "${{ secrets.APPLICATION_PROD }}" > ./application-prod.yml
 
-    # permission
-    - name: Add permission
-      run: chmod +x gradlew
-
+    # Gradle clean build
     - name: Build with Gradle
-      run: ./gradlew build -x test
+      uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+      with:
+        arguments: clean build
+      env:
+        SPRING_PROFILES_ACTIVE: prod
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -106,10 +106,6 @@ jobs:
         docker build -f Dockerfile-prod -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
-
-    - name: Download ECS Task Definition
-      run: |
-        aws ecs describe-task-definition --task-definition task-definition-production --query taskDefinition > task-definition-production.json
 
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
