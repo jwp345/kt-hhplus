@@ -58,6 +58,16 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
+    - name: Gradle Caching
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+
       # prod setting
     - name: make application-prod.yml
       if: contains(github.ref, 'master')
@@ -96,6 +106,10 @@ jobs:
         docker build -f Dockerfile-prod -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+    - name: Download ECS Task Definition
+      run: |
+        aws ecs describe-task-definition --task-definition deploy-prod-taskdefinition --query taskDefinition > task-definition.json
 
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
