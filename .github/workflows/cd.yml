@@ -35,8 +35,7 @@ env:
   ECR_REPOSITORY: init           # set this to your Amazon ECR repository name
   ECS_SERVICE: prod-application                  # set this to your Amazon ECS service name
   ECS_CLUSTER: prodCluster                 # set this to your Amazon ECS cluster name
-  ECS_TASK_DEFINITION: container-kt # set this to the path to your Amazon ECS task definition
-                                               # file, e.g. .aws/task-definition.json
+  ECS_TASK_DEFINITION: task-definition-production.json
   CONTAINER_NAME: prod-application           # set this to the name of the container in the
                                                # containerDefinitions section of your task definition
 
@@ -67,7 +66,11 @@ jobs:
         touch ./application-prod.yml
         echo "${{ secrets.APPLICATION_PROD }}" > ./application-prod.yml
 
-      # Gradle clean build
+    # permission
+    - name: Add permission
+      run: chmod +x gradlew
+
+    # Gradle clean build
     - name: Build with Gradle
       uses: gradle/gradle-build-action@v2
       with:
