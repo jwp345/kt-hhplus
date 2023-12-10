@@ -66,6 +66,13 @@ jobs:
         touch ./application-prod.yml
         echo "${{ secrets.APPLICATION_PROD }}" > ./application-prod.yml
 
+    # permission
+    - name: Add permission
+      run: chmod +x gradlew
+
+    - name: Build with Gradle
+      run: ./gradlew build -x test
+
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
