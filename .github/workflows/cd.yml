@@ -36,7 +36,7 @@ env:
   ECS_SERVICE: prod-application                  # set this to your Amazon ECS service name
   ECS_CLUSTER: prodCluster                 # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION: task-definition-production.json
-  CONTAINER_NAME: docker-test-prod
+  CONTAINER_NAME: container-kt
 
 permissions:
   contents: read
@@ -75,13 +75,12 @@ jobs:
         touch ./application-prod.yml
         echo "${{ secrets.APPLICATION_PROD }}" > ./application-prod.yml
 
-    # Gradle clean build
+    # permission
+    - name: Add permission
+      run: chmod +x gradlew
+
     - name: Build with Gradle
-      uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
-      with:
-        arguments: clean build
-      env:
-        SPRING_PROFILES_ACTIVE: prod
+      run: ./gradlew build -x test
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
