@@ -1,5 +1,5 @@
 {
-  "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:762741789598:task-definition/role-kt:1",
+  "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:762741789598:task-definition/role-kt:5",
   "containerDefinitions": [
     {
       "name": "container-kt",
@@ -16,10 +16,8 @@
       ],
       "essential": true,
       "environment": [],
-      "environmentFiles": [],
       "mountPoints": [],
       "volumesFrom": [],
-      "ulimits": [],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
@@ -27,15 +25,14 @@
           "awslogs-group": "/ecs/role-kt",
           "awslogs-region": "ap-northeast-2",
           "awslogs-stream-prefix": "ecs"
-        },
-        "secretOptions": []
+        }
       }
     }
   ],
   "family": "role-kt",
   "executionRoleArn": "arn:aws:iam::762741789598:role/ecsTaskExecutionRole",
   "networkMode": "awsvpc",
-  "revision": 1,
+  "revision": 5,
   "volumes": [],
   "status": "ACTIVE",
   "requiresAttributes": [
@@ -78,7 +75,7 @@
     "cpuArchitecture": "X86_64",
     "operatingSystemFamily": "LINUX"
   },
-  "registeredAt": "2023-12-10T12:40:25.045Z",
-  "registeredBy": "arn:aws:iam::762741789598:root",
+  "registeredAt": "2023-12-10T18:01:17.213Z",
+  "registeredBy": "arn:aws:iam::762741789598:user/dbAndDeploy",
   "tags": []
 }
