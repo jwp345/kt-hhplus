@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/token")
 class TokenRestController(val tokenProvider : TokenProvider) {
 
-    @PostMapping("/token")
+    @PostMapping("")
     fun generateToken() : ApiResponse<WaitTokenDto> {
         return ApiResponse.ok(tokenProvider.createToken())
     }

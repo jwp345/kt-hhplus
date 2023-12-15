@@ -4,8 +4,10 @@ plugins {
     id("org.springframework.boot") version "3.2.0"
     id("io.spring.dependency-management") version "1.1.4"
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
+    id("org.jetbrains.kotlin.plugin.allopen") version "1.9.20"
     kotlin("jvm") version "1.9.20"
     kotlin("plugin.spring") version "1.9.20"
+    kotlin("plugin.jpa") version "1.9.20"
 }
 
 group = "com.hhplus"
@@ -26,6 +28,7 @@ repositories {
 }
 
 dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
@@ -38,6 +41,8 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.2")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.2")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
+    runtimeOnly("com.h2database:h2")
+    implementation("org.springframework.boot:spring-boot-devtools")
 }
 
 tasks.withType<KotlinCompile> {
@@ -49,4 +54,10 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+allOpen {
+    annotation("jakarta.persistence.Entity")
+    annotation("jakarta.persistence.Embeddable")
+    annotation("jakarta.persistence.MappedSuperclass")
 }
