@@ -1,4 +1,5 @@
 package com.hhplus.controller.date
 
-class AvailableDateDto {
-}
+import java.time.LocalDateTime
+
+data class AvailableDateDto (val dates : List<LocalDateTime>)

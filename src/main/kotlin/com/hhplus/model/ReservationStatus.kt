@@ -1,26 +1,27 @@
 package com.hhplus.model
 
 import com.hhplus.common.BaseEntity
-import com.hhplus.common.ReservationStatusCode
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 @Entity
-class ReservationStatus(seatId : Long, reserveDate : LocalDateTime, reservationStatusCode: ReservationStatusCode) : BaseEntity(){
+@Table(name = "seat_reservation_status")
+class ReservationStatus(seatId : Long, availableDate : LocalDateTime, status : Int) : BaseEntity(){
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
 
-    @Column(name = "seat_id")
+    @Column(name = "SEAT_ID")
     var seatId : Long = seatId
 
-    @Column(name = "reserve_date")
-    var reserveDate : LocalDateTime = reserveDate
+    @Column(name = "AVAILABLE_DATE")
+    var availableDate : LocalDateTime = availableDate
 
-    @Column(name = "status")
-    var status : ReservationStatusCode = reservationStatusCode
+    @Column(name = "STATUS")
+    var status : Int = status
 }

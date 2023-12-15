@@ -16,6 +16,6 @@ abstract class BaseEntity {
     protected val createdAt: LocalDateTime = LocalDateTime.now()
 
     @LastModifiedDate
-    @Column(name = "MODIFIED_AT", nullable = false)
+    @Column(name = "MODIFIED_AT", nullable = true)
     protected var modifiedAt: LocalDateTime = LocalDateTime.now()
 }
