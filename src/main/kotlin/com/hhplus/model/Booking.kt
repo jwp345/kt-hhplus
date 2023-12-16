@@ -10,18 +10,21 @@ import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "seat_reservation_status")
-class ReservationStatus(seatId : Long, availableDate : LocalDateTime, status : Int) : BaseEntity(){
+@Table
+class Booking(seatId : Long, availableDate : LocalDateTime, status : Int, userId: Long? = null) : BaseEntity(){
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
 
-    @Column(name = "SEAT_ID")
+    @Column(name = "SEAT_ID", length = 2)
     var seatId : Long = seatId
 
     @Column(name = "AVAILABLE_DATE")
     var availableDate : LocalDateTime = availableDate
 
-    @Column(name = "STATUS")
+    @Column(name = "STATUS", nullable = false, length = 1)
     var status : Int = status
+
+    @Column(name = "USER_ID", nullable = true)
+    var userId : Long? = userId
 }

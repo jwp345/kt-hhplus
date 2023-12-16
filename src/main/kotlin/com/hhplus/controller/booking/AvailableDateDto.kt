@@ -1,4 +1,4 @@
-package com.hhplus.controller.date
+package com.hhplus.controller.booking
 
 import java.time.LocalDateTime
 
