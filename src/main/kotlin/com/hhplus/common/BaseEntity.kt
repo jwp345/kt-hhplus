@@ -13,9 +13,9 @@ import java.time.LocalDateTime
 abstract class BaseEntity {
     @CreatedDate
     @Column(name = "CREATED_AT", nullable = false, updatable = false)
-    protected val createdAt: LocalDateTime = LocalDateTime.now()
+    protected val createdAt: LocalDateTime ?= null
 
     @LastModifiedDate
     @Column(name = "MODIFIED_AT", nullable = true)
-    protected var modifiedAt: LocalDateTime = LocalDateTime.now()
+    protected var modifiedAt: LocalDateTime ?= null
 }

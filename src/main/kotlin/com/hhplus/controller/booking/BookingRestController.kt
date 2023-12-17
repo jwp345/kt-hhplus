@@ -2,7 +2,6 @@ package com.hhplus.controller.booking
 
 import com.hhplus.controller.ApiResponse
 import com.hhplus.service.booking.BookingService
-import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -23,8 +22,10 @@ class BookingRestController (val bookingService: BookingService){
     }
 
 //    @GetMapping("/seats/availabe")
-//    fun findSeatsAvailable(@RequestParam(required = true) dates: String) : ApiResponse<> {
-//
+//    fun findSeatsAvailable(@RequestParam(required = true) date: String) : ApiResponse<> {
+//        return try {
+//            ApiResponse.ok(bookingService.findSeatsAvailable(date))
+//        }
 //    }
 
 }
