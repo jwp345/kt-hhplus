@@ -7,13 +7,17 @@ import com.hhplus.repository.booking.BookingRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.stream.Collectors
 
 @Service
 class BookingService (val bookingRepository: BookingRepository) {
+
+    private val expiredBookingTime =
+        LocalDateTime.now().minusMinutes(5).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+
     fun findDatesAvailable(seatId : Int) : DatesAvailableDto {
         if(seatId > 50 || seatId <= 0) throw IllegalArgumentException()
-        return DatesAvailableDto(bookingRepository.findBySeatIdAndStatus(seatId, BookingStatusCode.AVAILABLE.code))
+        return DatesAvailableDto(bookingRepository.findDatesBySeatId(seatId = seatId, targetDate = expiredBookingTime,
+            availableCode = BookingStatusCode.AVAILABLE.code, reservedCode = BookingStatusCode.RESERVED.code))
     }
 
     fun findSeatsAvailable(date: String): SeatsAvailableDto {
@@ -22,6 +26,8 @@ class BookingService (val bookingRepository: BookingRepository) {
         } catch (e : Exception) {
             throw IllegalArgumentException()
         }
-        return SeatsAvailableDto(bookingRepository.findByAvailableDateAndStatus(date, BookingStatusCode.AVAILABLE.code))
+        return SeatsAvailableDto(bookingRepository.findSeatIdByBookingDate(bookingDate = date, targetDate = expiredBookingTime,
+            availableCode = BookingStatusCode.AVAILABLE.code, reservedCode = BookingStatusCode.RESERVED.code))
     }
 }
+

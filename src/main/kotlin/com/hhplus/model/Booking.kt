@@ -1,6 +1,7 @@
 package com.hhplus.model
 
 import com.hhplus.common.BaseEntity
+import com.hhplus.common.BookingStatusCode
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -12,20 +13,24 @@ import java.time.format.DateTimeFormatter
 
 @Entity
 @Table
-class Booking(seatId : Long, availableDate : String, status : Int, userId: Long? = null) : BaseEntity(){
+class Booking(seatId : Long, bookingDate : String, status : BookingStatusCode,
+              userId: Long ?= null, reservedDate: String ?= null) : BaseEntity(){
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
 
-    @Column(name = "SEAT_ID", length = 2)
+    @Column(name = "seat_id", length = 2)
     var seatId : Long = seatId
 
-    @Column(name = "AVAILABLE_DATE", length = 16)
-    var availableDate : String = availableDate
+    @Column(name = "booking_date", length = 16)
+    var bookingDate : String = bookingDate
 
-    @Column(name = "STATUS", nullable = false, length = 1)
-    var status : Int = status
+    @Column(name = "status", nullable = false, length = 1)
+    var status : Int = status.code
 
-    @Column(name = "USER_ID", nullable = true)
+    @Column(name = "user_id", nullable = true)
     var userId : Long? = userId
+
+    @Column(name = "reserved_date", nullable = true, length = 16)
+    var reservedDate : String? = reservedDate
 }

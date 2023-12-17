@@ -41,7 +41,7 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.2")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.2")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
-    runtimeOnly("com.h2database:h2")
+    implementation ("org.mariadb.jdbc:mariadb-java-client:2.7.4")
     implementation("org.springframework.boot:spring-boot-devtools")
 }
 

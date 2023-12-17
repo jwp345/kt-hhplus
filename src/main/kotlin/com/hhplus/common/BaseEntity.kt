@@ -12,10 +12,11 @@ import java.time.LocalDateTime
 @EntityListeners(AuditingEntityListener::class)
 abstract class BaseEntity {
     @CreatedDate
-    @Column(name = "CREATED_AT", nullable = false, updatable = false)
-    protected val createdAt: LocalDateTime ?= null
+    @Column(name = "created_at", nullable = false, updatable = false)
+    var createdAt: LocalDateTime ?= null
 
     @LastModifiedDate
-    @Column(name = "MODIFIED_AT", nullable = true)
-    protected var modifiedAt: LocalDateTime ?= null
+    @Column(name = "modified_at", nullable = false)
+    var modifiedAt: LocalDateTime ?= null
+
 }
