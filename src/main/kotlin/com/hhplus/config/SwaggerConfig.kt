@@ -19,7 +19,7 @@ class SwaggerConfig {
 //        .addSecurityItem(SecurityRequirement().addList(SECURITY_SCHEME_NAME))
         .info(
             Info()
-            .title("쿠폰 예약 서비스")
+            .title("콘서트 예약 서비스")
             .description("콘서트 예약 서비스를 위한 api들입니다.")
             .version("1.0.0"))
 }

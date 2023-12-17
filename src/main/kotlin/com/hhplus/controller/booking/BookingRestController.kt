@@ -13,19 +13,21 @@ import java.lang.IllegalArgumentException
 class BookingRestController (val bookingService: BookingService){
 
     @GetMapping("/dates/available")
-    fun findDatesAvailable(@RequestParam(required = true) seatId: Int) : ApiResponse<AvailableDateDto?> {
+    fun findDatesAvailable(@RequestParam(required = true) seatId: Int) : ApiResponse<DatesAvailableDto?> {
         return try {
             ApiResponse.ok(bookingService.findDatesAvailable(seatId))
         } catch (e: IllegalArgumentException) {
-            ApiResponse.error(4001, "유효한 입력이 아닙니다.")
+            ApiResponse.error(4001, "좌석의 숫자는 1~50이여야 합니다.")
         }
     }
 
-//    @GetMapping("/seats/availabe")
-//    fun findSeatsAvailable(@RequestParam(required = true) date: String) : ApiResponse<> {
-//        return try {
-//            ApiResponse.ok(bookingService.findSeatsAvailable(date))
-//        }
-//    }
+    @GetMapping("/seats/available")
+    fun findSeatsAvailable(@RequestParam(required = true) date: String) : ApiResponse<SeatsAvailableDto?> {
+        return try {
+            ApiResponse.ok(bookingService.findSeatsAvailable(date))
+        } catch (e: IllegalArgumentException) {
+            ApiResponse.error(4002, "유효한 날짜 형식이 아닙니다.")
+        }
+    }
 
 }

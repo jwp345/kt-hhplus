@@ -22,4 +22,11 @@ internal class BookingServiceTest {
         }
     }
 
+    @Test
+    fun `유효한 날짜 아닌 인풋 테스트`() {
+        assertThrows(IllegalArgumentException::class.java) {
+            bookingService.findSeatsAvailable("12")
+        }
+    }
+
 }
