@@ -9,6 +9,7 @@ import java.util.stream.Collectors
 @Service
 class BookingService (val reservationDateRepository: BookingRepository) {
     fun findDatesAvailable(seatId : Int) : AvailableDateDto {
+        if(seatId > 50 || seatId <= 0) throw IllegalArgumentException()
         return AvailableDateDto(reservationDateRepository.findBySeatIdAndStatus(seatId, BookingStatusCode.AVAILABLE.code)
             .stream().map { list -> list.availableDate }
             .collect(Collectors.toList()))
