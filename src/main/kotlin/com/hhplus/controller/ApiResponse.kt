@@ -9,26 +9,21 @@ data class ApiResponse<T>(
     val data: T,
 ) {
     companion object {
-        private fun <T> of(status: HttpStatus, message: String, data: T): ApiResponse<T> {
+
+        private fun <T> of(code: Int, message: String?, data: T): ApiResponse<T> {
             return ApiResponse(
-                code = status.value(),
+                code = code,
                 message = message,
                 data = data,
             )
         }
 
-        private fun <T> of(status: HttpStatus, data: T): ApiResponse<T> {
-            return of(status, status.name, data)
-        }
-
         fun <T> ok(data: T): ApiResponse<T> {
-            return of(HttpStatus.OK, data)
+            return of(HttpStatus.OK.value(), null, data)
         }
 
         fun <T> error(code: Int, message: String): ApiResponse<T?> {
-            return ApiResponse(code = code,
-                message = message,
-                null)
+            return of(code, message, null)
         }
     }
 }
