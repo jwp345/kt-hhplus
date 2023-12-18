@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.redis.connection.RedisConnectionFactory
 
+
 @Configuration
 @ConfigurationProperties(prefix = "spring.data.redis")
 class RedisConfig {
@@ -29,4 +30,5 @@ class RedisConfig {
     fun redisConnectionFactory(redissonClient: RedissonClient): RedisConnectionFactory {
         return RedissonConnectionFactory(redissonClient)
     }
+
 }

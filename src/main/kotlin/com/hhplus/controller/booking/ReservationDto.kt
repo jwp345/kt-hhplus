@@ -1,4 +1,4 @@
 package com.hhplus.controller.booking
 
-class ReservationDto {
+data class ReservationDto(var seatId : Int, var bookingDate : String) {
 }

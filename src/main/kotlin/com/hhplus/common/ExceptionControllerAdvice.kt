@@ -1,10 +1,10 @@
 package com.hhplus.common
 
 import com.hhplus.controller.ApiResponse
-import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.RestControllerAdvice
 
-@ControllerAdvice
+@RestControllerAdvice
 class ExceptionControllerAdvice {
 
     @ExceptionHandler

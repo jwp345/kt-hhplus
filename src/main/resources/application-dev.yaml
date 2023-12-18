@@ -12,5 +12,4 @@ spring:
     show_sql: true
     hibernate:
       ddl-auto: create
-    database-platform: org.hibernate.dialect.MariaDB103Dialect
     defer-datasource-initialization: true
