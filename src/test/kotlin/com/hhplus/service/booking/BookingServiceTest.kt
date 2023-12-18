@@ -11,6 +11,7 @@ import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import java.lang.IllegalArgumentException
+import java.time.LocalDateTime
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -26,7 +27,7 @@ internal class BookingServiceTest {
     internal fun init() {
         bookingRepository.save(Booking(seatId = 1L, bookingDate = "2023-12-13 15:30", status = BookingStatusCode.AVAILABLE))
         bookingRepository.save(Booking(seatId = 1L, bookingDate = "2023-12-13 17:30",
-            status = BookingStatusCode.RESERVED, reservedDate = "2023-12-13 17:30"))
+            status = BookingStatusCode.RESERVED, reservedDate = LocalDateTime.now().minusDays(6)))
     }
 
     @Test

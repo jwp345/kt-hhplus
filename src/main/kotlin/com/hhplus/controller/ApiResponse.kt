@@ -22,7 +22,7 @@ data class ApiResponse<T>(
             return of(HttpStatus.OK.value(), null, data)
         }
 
-        fun <T> error(code: Int, message: String): ApiResponse<T?> {
+        fun <T> error(code: Int, message: String?): ApiResponse<T?> {
             return of(code, message, null)
         }
     }

@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter
 @Entity
 @Table
 class Booking(seatId : Long, bookingDate : String, status : BookingStatusCode,
-              userId: Long ?= null, reservedDate: String ?= null) : BaseEntity(){
+              userId: Long ?= null, reservedDate: LocalDateTime ?= null) : BaseEntity(){
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
@@ -31,6 +31,6 @@ class Booking(seatId : Long, bookingDate : String, status : BookingStatusCode,
     @Column(name = "user_id", nullable = true)
     var userId : Long? = userId
 
-    @Column(name = "reserved_date", nullable = true, length = 16)
-    var reservedDate : String? = reservedDate
+    @Column(name = "reserved_at", nullable = true)
+    var reservedAt : LocalDateTime? = reservedDate
 }
