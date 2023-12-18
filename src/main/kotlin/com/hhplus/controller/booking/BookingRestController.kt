@@ -15,21 +15,17 @@ class BookingRestController (val bookingService: BookingService){
 
     @GetMapping("/dates/available")
     fun findDatesAvailable(@RequestParam(required = true) seatId: Int) : ApiResponse<DatesAvailableDto?> {
-        return ApiResponse.ok(bookingService.findDatesAvailable(seatId))
+        return ApiResponse.ok(bookingService.findDatesAvailable(seatId = seatId))
     }
 
     @GetMapping("/seats/available")
     fun findSeatsAvailable(@RequestParam(required = true) date: String) : ApiResponse<SeatsAvailableDto?> {
-        return ApiResponse.ok(bookingService.findSeatsAvailable(date))
+        return ApiResponse.ok(bookingService.findSeatsAvailable(date = date))
     }
 
-//    @PostMapping("/seat/reservation")
-//    fun reserveSeat(@RequestBody reservationRequest: ReservationRequest) : ApiResponse<ReservationDto> {
-//        return try {
-//            ApiResponse.ok(bookingService.reserveSeat())
-//        } catch (e: IllegalArgumentException) {
-//            ApiResponse.error(4002, "유효한 날짜 형식이 아닙니다.")
-//        }
-//    }
+    @PostMapping("/seat/reservation")
+    fun reserveSeat(@RequestBody reservationRequest: ReservationRequest) : ApiResponse<ReservationDto> {
+        return ApiResponse.ok(bookingService.reserveSeat(seatId = reservationRequest.seatId, bookingDate = reservationRequest.date))
+    }
 
 }

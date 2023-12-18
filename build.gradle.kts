@@ -43,6 +43,7 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
     implementation ("org.mariadb.jdbc:mariadb-java-client:2.7.4")
     implementation("org.springframework.boot:spring-boot-devtools")
+    implementation("org.redisson:redisson-spring-boot-starter:3.21.1")
 }
 
 tasks.withType<KotlinCompile> {
