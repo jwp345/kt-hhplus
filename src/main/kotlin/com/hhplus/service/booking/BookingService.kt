@@ -8,9 +8,10 @@ import com.hhplus.controller.booking.DatesAvailableDto
 import com.hhplus.controller.booking.ReservationDto
 import com.hhplus.controller.booking.SeatsAvailableDto
 import com.hhplus.exception.InvalidTicketException
-import com.hhplus.model.Booking
 import com.hhplus.repository.booking.BookingRepository
 import org.redisson.api.RedissonClient
+import org.springframework.retry.annotation.Backoff
+import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -23,6 +24,9 @@ class BookingService (val bookingRepository: BookingRepository, val redissonClie
     * 일정 시간마다 스케줄러 돌려서 배치성으로 실행해야 하나?
     * OR 그때그때마다 비동기로 실행시킬까?
     * */
+
+    private final val reserveLock : String = "reserve-seat-lock"
+    private final val cacheReserveKey : String = "seatReservation"
 
     fun findDatesAvailable(seatId : Int) : DatesAvailableDto {
         checkSeatId(seatId = seatId)
@@ -48,6 +52,8 @@ class BookingService (val bookingRepository: BookingRepository, val redissonClie
         return SeatsAvailableDto(availableSeats)
     }
 
+    // 의문: 적절한 락의 소유시간 및 재시도 정책
+    @Retryable(value = [org.redisson.client.RedisTimeoutException::class], maxAttempts = 2, backoff = Backoff(delay = 2000))
     fun reserveSeat(seatId: Int, bookingDate: String, userId: Long): ReservationDto {
         checkSeatId(seatId = seatId)
         checkBookingDate(date = bookingDate)
@@ -57,12 +63,25 @@ class BookingService (val bookingRepository: BookingRepository, val redissonClie
             throw InvalidTicketException()
         }
         val key : String = "" + seatId + "_" + bookingDate
-        val cacheMap = redissonClient.getMapCache<String, Long>("seatReservation")
-        if(cacheMap.contains(key)) {
-            throw AlreadyReservationException()
+        val mapLock = redissonClient.getLock(reserveLock)
+        try {
+            mapLock.lock(4, TimeUnit.SECONDS)
+            val cacheMap = redissonClient.getMapCache<String, Long>(cacheReserveKey)
+            if (cacheMap.contains(key)) {
+                throw AlreadyReservationException()
+            }
+            cacheMap.put(key, userId, 300, TimeUnit.SECONDS)
+            return ReservationDto(
+                seatId = seatId,
+                bookingDate = bookingDate,
+                userId = userId,
+                reservedDate = LocalDateTime.now()
+            )
+        } finally {
+            if (mapLock != null && mapLock.isLocked && mapLock.isHeldByCurrentThread) {
+                mapLock.unlock()
+            }
         }
-        cacheMap.put(key, userId, 300, TimeUnit.SECONDS)
-        return ReservationDto(seatId = seatId, bookingDate = bookingDate, userId = userId, reservedDate = LocalDateTime.now())
     }
 
     private fun checkBookingDate(date: String): LocalDateTime {
@@ -79,9 +98,12 @@ class BookingService (val bookingRepository: BookingRepository, val redissonClie
         }
     }
 
+    // 락 획득 로직도 테스트 코드를 짜야할까? 짠다면 순서 보장이 되면서 동시성 테스트가 가능한가?
+    @Retryable(value = [org.redisson.client.RedisTimeoutException::class], maxAttempts = 2, backoff = Backoff(delay = 2000))
     private fun isReserved(seatId: Int, bookingDate: String): Boolean {
         val key : String = "" + seatId + "_" + bookingDate
-        val cacheMap = redissonClient.getMapCache<String, Long>("seatReservation")
+        redissonClient.getLock(reserveLock)
+        val cacheMap = redissonClient.getMapCache<String, Long>(cacheReserveKey)
         return cacheMap.contains(key)
     }
 

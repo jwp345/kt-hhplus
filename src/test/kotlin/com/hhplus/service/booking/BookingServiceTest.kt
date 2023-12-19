@@ -10,9 +10,14 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.redisson.api.RedissonClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import java.lang.IllegalArgumentException
+import java.util.*
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -24,8 +29,12 @@ internal class BookingServiceTest {
     @Autowired
     private lateinit var bookingRepository: BookingRepository
 
+    @Autowired
+    private lateinit var redissonClient: RedissonClient
+
     @BeforeAll
     internal fun init() {
+        redissonClient.getMapCache<String, Long>("seatReservation").clear()
         bookingRepository.save(Booking(seatId = 1, bookingDate = "2023-12-13 15:30", status = BookingStatusCode.AVAILABLE))
         bookingRepository.save(Booking(seatId = 1, bookingDate = "2023-12-13 17:30",
             status = BookingStatusCode.CONFIRMED))
@@ -65,8 +74,34 @@ internal class BookingServiceTest {
 
     @Test
     fun `예약을 하게 되면 예약이 되어 있는 좌석은 예약 가능 리스트에 없다`() {
-        bookingService.reserveSeat(seatId = 1, bookingDate = "2023-12-13 15:30", userId = 1)
+        try {
+            bookingService.reserveSeat(seatId = 1, bookingDate = "2023-12-13 15:30", userId = 1)
+        } catch (_: Exception) {}
+        assertThat(bookingService.findSeatsAvailable("2023-12-13 15:30").seats.size).isZero()
+        assertThat(bookingService.findDatesAvailable(1).dates.size).isZero()
+    }
 
+    @Test
+    fun `동시에 10개 예약 요청이 오면 하나의 요청 빼곤 실패해야 한다`() {
+        val executor = Executors.newFixedThreadPool(10)
+        val latch = CountDownLatch(10)
+
+        val exceptionNum = AtomicInteger(0)
+
+        repeat(10) {
+            executor.submit{
+                try {
+                    bookingService.reserveSeat(1, bookingDate = "2023-12-13 15:30", userId = 1)
+                } catch (_: Exception) {
+                    exceptionNum.getAndIncrement()
+                }
+                latch.countDown()
+            }
+        }
+
+        latch.await()
+        executor.shutdown()
+        assertThat(exceptionNum.get()).isEqualTo(9)
     }
 
 }
