@@ -12,24 +12,17 @@ import java.time.LocalDateTime
 
 @Entity
 @Table
-class Booking(seatId : Long, bookingDate : String, status : BookingStatusCode,
-              userId: Long ?= null, reservedDate: LocalDateTime ?= null) : BaseEntity(){
+class Booking(seatId : Int, bookingDate : String, status : BookingStatusCode) : BaseEntity(){
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
 
     @Column(name = "seat_id", length = 2)
-    var seatId : Long = seatId
+    var seatId : Int = seatId
 
     @Column(name = "booking_date", length = 16)
     var bookingDate : String = bookingDate
 
     @Column(name = "status", nullable = false, length = 1)
     var status : Int = status.code
-
-    @Column(name = "user_id", nullable = true)
-    var userId : Long? = userId
-
-    @Column(name = "reserved_at", nullable = true)
-    var reservedAt : LocalDateTime? = reservedDate
 }

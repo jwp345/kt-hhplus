@@ -1,5 +1,6 @@
 package com.hhplus.common
 
+import com.hhplus.exception.InvalidInputException
 import com.hhplus.controller.ApiResponse
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice

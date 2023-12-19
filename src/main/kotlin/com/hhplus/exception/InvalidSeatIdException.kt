@@ -1,4 +1,4 @@
-package com.hhplus.common
+package com.hhplus.exception
 
 class InvalidSeatIdException : InvalidInputException() {
     override val code: Int = 4001

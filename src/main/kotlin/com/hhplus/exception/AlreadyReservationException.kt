@@ -1,4 +1,4 @@
-package com.hhplus.common
+package com.hhplus.exception
 
 class AlreadyReservationException : InvalidInputException() {
     override val code: Int = 4003
