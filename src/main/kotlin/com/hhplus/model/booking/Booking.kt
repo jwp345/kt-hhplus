@@ -1,4 +1,4 @@
-package com.hhplus.model
+package com.hhplus.model.booking
 
 import com.hhplus.common.BaseEntity
 import com.hhplus.common.BookingStatusCode
@@ -11,20 +11,20 @@ import jakarta.persistence.Table
 
 @Entity
 @Table
-class Booking(seatId : Int, bookingDate : String, status : BookingStatusCode, price : Int) : BaseEntity(){
+class Booking(seatId : Int, concertDate : String, status : BookingStatusCode, price : Long) : BaseEntity(){
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
 
-    @Column(name = "seat_id", length = 2)
+    @Column(name = "seat_id",  nullable = false, length = 2)
     var seatId : Int = seatId
 
-    @Column(name = "booking_date", length = 16)
-    var bookingDate : String = bookingDate
+    @Column(name = "concert_date", nullable = false, length = 16)
+    var concertDate : String = concertDate
 
     @Column(name = "status", nullable = false, length = 1)
     var status : Int = status.code
 
     @Column(name = "price", nullable = false) // 단위 : 원
-    var price : Int = price
+    var price : Long = price
 }

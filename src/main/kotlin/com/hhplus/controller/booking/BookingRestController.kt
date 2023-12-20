@@ -25,7 +25,7 @@ class BookingRestController (val bookingService: BookingService){
 
     @PostMapping("/seat/reservation")
     fun reserveSeat(@RequestBody reservationRequest: ReservationRequest) : ApiResponse<ReservationDto> {
-        return ApiResponse.ok(bookingService.reserveSeat(seatId = reservationRequest.seatId, bookingDate = reservationRequest.date,
+        return ApiResponse.ok(bookingService.reserveSeat(seatId = reservationRequest.seatId, concertDate = reservationRequest.date,
         userId = reservationRequest.userId))
     }
 

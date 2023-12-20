@@ -1,6 +1,6 @@
 package com.hhplus.common
 
-import com.hhplus.exception.InvalidInputException
+import com.hhplus.exception.InvalidException
 import com.hhplus.controller.ApiResponse
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 class ExceptionControllerAdvice {
 
     @ExceptionHandler
-    fun <T> handleIllegalStateException(ex: InvalidInputException): ApiResponse<T?> {
+    fun <T> handleIllegalStateException(ex: InvalidException): ApiResponse<T?> {
         return ApiResponse.error(code = ex.code, message = ex.message)
     }
 }
