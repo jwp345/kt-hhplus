@@ -14,7 +14,6 @@ import org.redisson.api.RedissonClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import java.lang.IllegalArgumentException
-import java.util.*
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
@@ -35,9 +34,10 @@ internal class BookingServiceTest {
     @BeforeAll
     internal fun init() {
         redissonClient.getMapCache<String, Long>("seatReservation").clear()
-        bookingRepository.save(Booking(seatId = 1, bookingDate = "2023-12-13 15:30", status = BookingStatusCode.AVAILABLE))
+        bookingRepository.save(Booking(seatId = 1, bookingDate = "2023-12-13 15:30", status = BookingStatusCode.AVAILABLE,
+            price = 3000))
         bookingRepository.save(Booking(seatId = 1, bookingDate = "2023-12-13 17:30",
-            status = BookingStatusCode.CONFIRMED))
+            status = BookingStatusCode.CONFIRMED, price = 5000))
     }
 
     @Test

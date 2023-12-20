@@ -52,8 +52,7 @@ class BookingService (val bookingRepository: BookingRepository, val redissonClie
         return SeatsAvailableDto(availableSeats)
     }
 
-    // 의문: 적절한 락의 소유시간 및 재시도 정책
-    @Retryable(value = [org.redisson.client.RedisTimeoutException::class], maxAttempts = 2, backoff = Backoff(delay = 2000))
+
     fun reserveSeat(seatId: Int, bookingDate: String, userId: Long): ReservationDto {
         checkSeatId(seatId = seatId)
         checkBookingDate(date = bookingDate)
@@ -62,11 +61,17 @@ class BookingService (val bookingRepository: BookingRepository, val redissonClie
         if(tickets.isEmpty() || tickets.size > 1) { // 티켓 유효성 검사
             throw InvalidTicketException()
         }
+        return reserveSeatInMemory(seatId = seatId, bookingDate = bookingDate, userId = userId)
+    }
+
+    @Retryable(value = [org.redisson.client.RedisTimeoutException::class], maxAttempts = 2, backoff = Backoff(delay = 2000))
+    private fun reserveSeatInMemory(seatId: Int, bookingDate: String, userId: Long) : ReservationDto {
+
         val key : String = "" + seatId + "_" + bookingDate
         val mapLock = redissonClient.getLock(reserveLock)
+        val cacheMap = redissonClient.getMapCache<String, Long>(cacheReserveKey)
         try {
             mapLock.lock(4, TimeUnit.SECONDS)
-            val cacheMap = redissonClient.getMapCache<String, Long>(cacheReserveKey)
             if (cacheMap.contains(key)) {
                 throw AlreadyReservationException()
             }
@@ -98,7 +103,7 @@ class BookingService (val bookingRepository: BookingRepository, val redissonClie
         }
     }
 
-    // 락 획득 로직도 테스트 코드를 짜야할까? 짠다면 순서 보장이 되면서 동시성 테스트가 가능한가?
+
     @Retryable(value = [org.redisson.client.RedisTimeoutException::class], maxAttempts = 2, backoff = Backoff(delay = 2000))
     private fun isReserved(seatId: Int, bookingDate: String): Boolean {
         val key : String = "" + seatId + "_" + bookingDate

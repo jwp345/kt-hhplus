@@ -11,7 +11,7 @@ import jakarta.persistence.Table
 
 @Entity
 @Table
-class Booking(seatId : Int, bookingDate : String, status : BookingStatusCode) : BaseEntity(){
+class Booking(seatId : Int, bookingDate : String, status : BookingStatusCode, price : Int) : BaseEntity(){
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
@@ -24,4 +24,7 @@ class Booking(seatId : Int, bookingDate : String, status : BookingStatusCode) : 
 
     @Column(name = "status", nullable = false, length = 1)
     var status : Int = status.code
+
+    @Column(name = "price", nullable = false) // 단위 : 원
+    var price : Int = price
 }
