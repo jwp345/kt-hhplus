@@ -1,6 +1,6 @@
 package com.hhplus.repository.booking
 
-import com.hhplus.model.booking.Booking
+import com.hhplus.model.Booking
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 

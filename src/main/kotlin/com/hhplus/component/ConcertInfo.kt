@@ -1,4 +1,4 @@
-package com.hhplus.model.booking
+package com.hhplus.component
 
 data class ConcertInfo(val seatId : Int, val date : String) {
 }

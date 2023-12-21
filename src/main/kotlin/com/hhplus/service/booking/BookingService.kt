@@ -2,18 +2,18 @@ package com.hhplus.service.booking
 
 import com.hhplus.exception.AlreadyReservationException
 import com.hhplus.common.BookingStatusCode
-import com.hhplus.config.RedisConfig
+import com.hhplus.component.ReserveCacheInfo
+import com.hhplus.component.ReserveMapGetter
 import com.hhplus.exception.InvalidDateException
 import com.hhplus.exception.InvalidSeatIdException
 import com.hhplus.controller.booking.DatesAvailableDto
 import com.hhplus.controller.booking.ReservationDto
 import com.hhplus.controller.booking.SeatsAvailableDto
 import com.hhplus.exception.InvalidTicketException
-import com.hhplus.model.booking.Booking
-import com.hhplus.model.booking.ConcertInfo
-import com.hhplus.model.booking.TicketInfo
+import com.hhplus.model.Booking
+import com.hhplus.component.ConcertInfo
+import com.hhplus.component.TicketInfo
 import com.hhplus.repository.booking.BookingRepository
-import org.redisson.api.RedissonClient
 import org.springframework.retry.annotation.Backoff
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
@@ -22,8 +22,8 @@ import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 
 @Service
-class BookingService (val bookingRepository: BookingRepository
-, val redissonClient: RedissonClient, val redisConfig: RedisConfig) {
+class BookingService (val bookingRepository: BookingRepository,
+ val reserveMapGetter: ReserveMapGetter) {
 
     /* TODO : 캐시(예약) 이력을 어떻게 쌓을 것인가?
     * 일정 시간마다 스케줄러 돌려서 배치성으로 실행해야 하나?
@@ -66,8 +66,9 @@ class BookingService (val bookingRepository: BookingRepository
         }
 
         val concertInfo = ConcertInfo(seatId = seatId, date = concertDate)
-        val mapLock = redissonClient.getLock(redisConfig.reserveLock)
-        val cacheMap = redissonClient.getMapCache<ConcertInfo, TicketInfo>(redisConfig.cacheReserveKey)
+        val lockAndMap : ReserveCacheInfo = reserveMapGetter.getLockAndReserveMap()
+        val mapLock = lockAndMap.lock
+        val cacheMap = lockAndMap.mapCache
         try {
             mapLock.lock(4, TimeUnit.SECONDS)
             if (cacheMap.contains(concertInfo)) {
@@ -81,7 +82,7 @@ class BookingService (val bookingRepository: BookingRepository
                 reservedDate = LocalDateTime.now()
             )
         } finally {
-            if (mapLock != null && mapLock.isLocked && mapLock.isHeldByCurrentThread) {
+            if (mapLock.isLocked && mapLock.isHeldByCurrentThread) {
                 mapLock.unlock()
             }
         }
@@ -101,13 +102,9 @@ class BookingService (val bookingRepository: BookingRepository
         }
     }
 
-
-    @Retryable(value = [org.redisson.client.RedisTimeoutException::class], maxAttempts = 2, backoff = Backoff(delay = 2000))
     private fun isReserved(seatId: Int, concertDate: String): Boolean {
-        val key : String = "" + seatId + "_" + concertDate
-        redissonClient.getLock(redisConfig.reserveLock)
-        val cacheMap = redissonClient.getMapCache<String, Long>(redisConfig.cacheReserveKey)
-        return cacheMap.contains(key)
+        val cacheMap = reserveMapGetter.getLockAndReserveMap().mapCache
+        return cacheMap.contains(ConcertInfo(seatId = seatId, date = concertDate))
     }
 
 }

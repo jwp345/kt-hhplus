@@ -23,6 +23,7 @@ class TokenProvider {
         this.orderNum = AtomicInteger(0);
     }
 
+    /* TODO: 중복 토큰 생성 방지 및 처리율 제한 위해 RateLimiter 어떻게 만들까? */
     fun createToken(): WaitTokenDto {
         val secretKey = "abcasdgxclkjblkefkkwlerjioasdfsdgsa"
         val expirationHours = 1L

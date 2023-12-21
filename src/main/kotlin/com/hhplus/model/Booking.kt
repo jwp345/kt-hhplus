@@ -1,4 +1,4 @@
-package com.hhplus.model.booking
+package com.hhplus.model
 
 import com.hhplus.common.BaseEntity
 import com.hhplus.common.BookingStatusCode

@@ -1,4 +1,4 @@
-package com.hhplus.model.user
+package com.hhplus.model
 
 import jakarta.persistence.*
 import java.util.UUID

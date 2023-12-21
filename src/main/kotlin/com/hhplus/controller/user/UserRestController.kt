@@ -21,6 +21,6 @@ class UserRestController(val userService: UserService) {
 
     @PostMapping("/payment")
     fun payMoney(@RequestBody request : PaymentRequest) : ApiResponse<PaymentResponse> {
-
+        return userService.payMoney(userId = request.userId, seatId = request.seatId, concertDate = request.concertDate, uuid = "uuid")
     }
 }

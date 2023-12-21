@@ -1,9 +1,10 @@
 package com.hhplus.service.booking
 
 import com.hhplus.common.BookingStatusCode
+import com.hhplus.config.RedisConfig
 import com.hhplus.exception.AlreadyReservationException
 import com.hhplus.exception.InvalidTicketException
-import com.hhplus.model.booking.Booking
+import com.hhplus.model.Booking
 import com.hhplus.repository.booking.BookingRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.*
@@ -31,9 +32,12 @@ internal class BookingServiceTest {
     @Autowired
     private lateinit var redissonClient: RedissonClient
 
+    @Autowired
+    private lateinit var redisConfig: RedisConfig
+
     @BeforeAll
     internal fun init() {
-        redissonClient.getMapCache<String, Long>("seatReservation").clear()
+        redissonClient.getMapCache<String, Long>(redisConfig.cacheReserveKey).clear()
         bookingRepository.save(
             Booking(seatId = 1, concertDate = "2023-12-13 15:30", status = BookingStatusCode.AVAILABLE,
             price = 3000)
@@ -95,7 +99,7 @@ internal class BookingServiceTest {
         repeat(10) {
             executor.submit{
                 try {
-                    bookingService.reserveSeat(1, concertDate = "2023-12-13 15:30", userId = 1)
+                    bookingService.reserveSeat(seatId = 1, concertDate = "2023-12-13 15:30", userId = 1)
                 } catch (_: Exception) {
                     exceptionNum.getAndIncrement()
                 }
@@ -108,4 +112,5 @@ internal class BookingServiceTest {
         assertThat(exceptionNum.get()).isEqualTo(9)
     }
 
+    // RedisTimeoutException 테스트?
 }

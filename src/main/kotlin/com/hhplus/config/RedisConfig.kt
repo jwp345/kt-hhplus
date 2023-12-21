@@ -16,7 +16,7 @@ class RedisConfig {
 
     lateinit var host: String
     var port: Int = 0
-    final val reserveLock : String = "reserve-seat-lock"
+    final val reserveLockName : String = "reserve-seat-lock"
     final val cacheReserveKey : String = "seatReservation"
 
     @Bean(destroyMethod = "shutdown")
