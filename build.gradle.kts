@@ -47,8 +47,9 @@ dependencies {
     implementation ("org.mariadb.jdbc:mariadb-java-client:2.7.4")
     implementation("org.springframework.boot:spring-boot-devtools")
     implementation("org.redisson:redisson-spring-boot-starter:3.21.1")
-    testImplementation ("io.kotest:kotest-runner-junit5:5.3.2")
-    testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.1")
+    testImplementation ("io.kotest:kotest-runner-junit5:5.5.5")
+    testImplementation ("io.kotest:kotest-assertions-core:5.5.5")
+    testImplementation("io.mockk:mockk:1.13.4")
 }
 
 tasks.withType<KotlinCompile> {

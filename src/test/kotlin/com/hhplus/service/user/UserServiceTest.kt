@@ -1,10 +1,16 @@
 package com.hhplus.service.user
 
+import com.hhplus.component.ReserveMapGetter
+import com.hhplus.component.UserReader
+import com.hhplus.exception.InvalidAuthenticationException
 import com.hhplus.model.User
-import com.hhplus.repository.user.UserRepository
-import io.kotest.assertions.any
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.AnnotationSpec
-import org.junit.jupiter.api.Assertions.*
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
+import java.util.*
 
 
 internal class UserServiceTest : AnnotationSpec() {
@@ -14,39 +20,40 @@ internal class UserServiceTest : AnnotationSpec() {
         // Given
         val userId = 1L
         val amount = 100
-        val uuid = "valid_uuid"
-        val userRepository = mockK<UserRepository>()
-        val userService = UserService(userRepository)
+        val uuid = UUID.randomUUID()
+        val userReader = mockk<UserReader>()
+        val userService = UserService(userReader, mockk<ReserveMapGetter>())
 
-        val user = User(userId = userId, balance = 50, uuid = "uuid")
+        val user = User(balance = 50, name = "jaewon", uuid = uuid)
 
-        every { userRepository.findById(userId) } returns user
-        every { userRepository.save(any()) } answers { firstArg() }
+        every { userReader.validCheckAndRead(userId = userId, uuid = uuid.toString()) } returns user
 
         // When
-        userService.chargeMoney(userId, amount, uuid)
+        userService.chargeMoney(userId, amount, uuid.toString())
 
         // Then
-        verify(exactly = 1) { userRepository.findById(userId) }
+        verify(exactly = 1) { userReader.validCheckAndRead(userId = userId, uuid = uuid.toString()) }
         user.balance shouldBe 150
     }
 
     @Test
-    fun `chargeMoney should throw InvalidAuthenticationException if authentication is invalid`() {
+    fun `인증된 사용자가 아닐 경우 충전 예외 발생`() {
         // Given
         val userId = 1L
         val amount = 100
-        val invalidUuid = "invalid_uuid"
-        val userRepository = mockk<UserRepository>()
-        val userService = UserService(userRepository)
+        val uuid = UUID.randomUUID()
+        val invalidUUid = UUID.randomUUID()
+        val userReader = mockk<UserReader>()
+        val userService = UserService(userReader, mockk<ReserveMapGetter>())
 
-        val user = User(id = userId, balance = 50, uuid = "valid_uuid")
+        val user = User(balance = 50, name = "jaewon", uuid = uuid)
 
-        every { userRepository.findById(userId) } returns user
+        every { userReader.validCheckAndRead(userId = userId, uuid = uuid.toString()) } returns user
+        every { userReader.validCheckAndRead(userId = userId, uuid = invalidUUid.toString())} throws InvalidAuthenticationException()
 
         // When, Then
         shouldThrow<InvalidAuthenticationException> {
-            userService.chargeMoney(userId, amount, invalidUuid)
+            userService.chargeMoney(userId, amount, invalidUUid.toString())
         }
     }
 }
