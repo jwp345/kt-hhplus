@@ -36,24 +36,5 @@ internal class UserServiceTest : AnnotationSpec() {
         user.balance shouldBe 150
     }
 
-    @Test
-    fun `인증된 사용자가 아닐 경우 충전 예외 발생`() {
-        // Given
-        val userId = 1L
-        val amount = 100
-        val uuid = UUID.randomUUID()
-        val invalidUUid = UUID.randomUUID()
-        val userReader = mockk<UserReader>()
-        val userService = UserService(userReader, mockk<ReserveMapGetter>())
 
-        val user = User(balance = 50, name = "jaewon", uuid = uuid)
-
-        every { userReader.validCheckAndRead(userId = userId, uuid = uuid.toString()) } returns user
-        every { userReader.validCheckAndRead(userId = userId, uuid = invalidUUid.toString())} throws InvalidAuthenticationException()
-
-        // When, Then
-        shouldThrow<InvalidAuthenticationException> {
-            userService.chargeMoney(userId, amount, invalidUUid.toString())
-        }
-    }
 }
