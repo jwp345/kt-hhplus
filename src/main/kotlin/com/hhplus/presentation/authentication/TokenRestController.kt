@@ -18,7 +18,7 @@ class TokenRestController(val tokenProvider : TokenProvider) {
     * 유효성 검증 및 USERID를 언제든 가져온다.
     * */
     @PostMapping("")
-    fun generateToken(@RequestParam(required = true) uuid: String) : ApiResponse<WaitTokenResponse> {
+    fun generateToken(@RequestParam(required = true) uuid: Long) : ApiResponse<WaitTokenResponse> {
         val waitToken : WaitToken = tokenProvider.createToken(uuid = uuid)
         return ApiResponse.ok(WaitTokenResponse(userUUID = waitToken.uuid, waitOrder = waitToken.order,
             token = waitToken.token))

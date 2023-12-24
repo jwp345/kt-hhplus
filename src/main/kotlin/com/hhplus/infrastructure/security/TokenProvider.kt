@@ -16,11 +16,11 @@ import javax.crypto.spec.SecretKeySpec
 class TokenProvider(val userWaitOrderFactory: UserWaitOrderFactory) {
 
     /* TODO: 중복 토큰 생성 방지 및 처리율 제한 위해 RateLimiter? */
-    fun createToken(uuid: String): WaitToken {
+    fun createToken(uuid: Long): WaitToken {
         val secretKey = "abcasdgxclkjblkefkkwlerjioasdfsdgsa"
         val expirationHours = 1L
         val userOrder = userWaitOrderFactory.getWaitOrder()
-        val claims = mapOf<String, Any>(
+        val claims = mapOf(
             "uuid" to uuid,
             "order" to userOrder
         )

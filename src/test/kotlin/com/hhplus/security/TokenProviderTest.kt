@@ -31,8 +31,8 @@ internal class TokenProviderTest {
 
     @Test
     fun `토큰을 생성한다`(){
-        val token = tokenProvider.createToken(uuid = "uuid")
-        assertThat(token.uuid).isNotEmpty()
+        val token = tokenProvider.createToken(uuid = 11L)
+        assertThat(token.uuid).isNotNull()
         assertThat(token.order).isEqualTo(1L)
     }
 
@@ -60,6 +60,6 @@ internal class TokenProviderTest {
     private fun threadRequest(orders : MutableList<Long>) {
         val threadName = Thread.currentThread().name
         println("Processing request on thread: $threadName")
-        orders.add(tokenProvider.createToken(uuid = "uuid").order)
+        orders.add(tokenProvider.createToken(uuid = 11L).order)
     }
 }
