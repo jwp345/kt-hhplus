@@ -3,6 +3,7 @@ package com.hhplus.component
 import com.hhplus.domain.entity.Booking
 import com.hhplus.domain.info.ConcertInfo
 import com.hhplus.domain.repository.BookingRepository
+import com.hhplus.domain.repository.TicketRepository
 import com.hhplus.infrastructure.exception.InvalidDateException
 import com.hhplus.infrastructure.exception.InvalidSeatIdException
 import com.hhplus.presentation.booking.BookingStatusCode
@@ -11,7 +12,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Component
-class BookingReader(val bookingRepository: BookingRepository, val ticketFactory: TicketFactory) {
+class BookingReader(val bookingRepository: BookingRepository, val ticketRepository: TicketRepository) {
 
     fun read(seatId : Int) : List<Booking> {
         checkSeatId(seatId = seatId)
@@ -48,7 +49,7 @@ class BookingReader(val bookingRepository: BookingRepository, val ticketFactory:
     }
 
     private fun isReserved(seatId: Int, bookingDate: String): Boolean {
-        val cacheMap = ticketFactory.getLockAndReserveMap().mapCache
+        val cacheMap = ticketRepository.getLockAndReserveMap().mapCache
         return cacheMap.contains(ConcertInfo(seatId = seatId, date = bookingDate))
     }
 }

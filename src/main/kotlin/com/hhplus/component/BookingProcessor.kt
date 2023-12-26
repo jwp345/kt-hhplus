@@ -4,6 +4,7 @@ import com.hhplus.domain.entity.Booking
 import com.hhplus.domain.info.ConcertInfo
 import com.hhplus.domain.info.ReserveCacheInfo
 import com.hhplus.domain.info.TicketInfo
+import com.hhplus.domain.repository.TicketRepository
 import com.hhplus.infrastructure.exception.AlreadyReservationException
 import com.hhplus.infrastructure.exception.InvalidTicketException
 import org.springframework.retry.annotation.Backoff
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Component
 import java.util.concurrent.TimeUnit
 
 @Component
-class BookingProcessor(val ticketFactory: TicketFactory) {
+class BookingProcessor(val ticketRepository: TicketRepository) {
 
     @Retryable(value = [org.redisson.client.RedisTimeoutException::class],
         maxAttempts = 2, backoff = Backoff(delay = 2000))
@@ -23,7 +24,7 @@ class BookingProcessor(val ticketFactory: TicketFactory) {
 
         val booking : Booking = bookings[0]
         val concertInfo = ConcertInfo(seatId = booking.seatId, date = booking.bookingDate)
-        val lockAndMap : ReserveCacheInfo = ticketFactory.getLockAndReserveMap()
+        val lockAndMap : ReserveCacheInfo = ticketRepository.getLockAndReserveMap()
         return lockAndMap.run {
             lock.lock(4, TimeUnit.SECONDS)
             try {

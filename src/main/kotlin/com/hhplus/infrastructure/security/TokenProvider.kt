@@ -1,7 +1,6 @@
 package com.hhplus.infrastructure.security
 
-import com.hhplus.component.UserWaitOrderFactory
-import com.hhplus.presentation.authentication.WaitTokenResponse
+import com.hhplus.domain.repository.WaitOrderRepository
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.stereotype.Service
@@ -13,13 +12,13 @@ import java.util.*
 import javax.crypto.spec.SecretKeySpec
 
 @Service
-class TokenProvider(val userWaitOrderFactory: UserWaitOrderFactory) {
+class TokenProvider(val waitOrderRepository: WaitOrderRepository) {
 
     /* TODO: 중복 토큰 생성 방지 및 처리율 제한 위해 RateLimiter? */
     fun createToken(uuid: Long): WaitToken {
         val secretKey = "abcasdgxclkjblkefkkwlerjioasdfsdgsa"
         val expirationHours = 1L
-        val userOrder = userWaitOrderFactory.getWaitOrder()
+        val userOrder = waitOrderRepository.getWaitOrder()
         val claims = mapOf(
             "uuid" to uuid,
             "order" to userOrder
