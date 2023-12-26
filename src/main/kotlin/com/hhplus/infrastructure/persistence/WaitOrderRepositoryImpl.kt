@@ -29,4 +29,8 @@ class WaitOrderRepositoryImpl(val redissonClient: RedissonClient, val redisConfi
     override fun save(uuid: Long, order : Long) {
         redissonClient.getMap<Long, Long>(redisConfig.waitOrderMapKey)[uuid] = order
     }
+
+    override fun delete(uuid: Long) {
+        redissonClient.getMap<Long, Long>(redisConfig.waitOrderMapKey).remove(uuid)
+    }
 }

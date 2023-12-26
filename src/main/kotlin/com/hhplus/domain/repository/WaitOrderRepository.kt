@@ -7,4 +7,6 @@ interface WaitOrderRepository {
     fun findWaitOrderByUuid(uuid : Long) : Long?
 
     fun save(uuid: Long, order : Long)
+
+    fun delete(uuid: Long)
 }
