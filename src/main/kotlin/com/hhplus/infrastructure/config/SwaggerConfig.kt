@@ -16,7 +16,6 @@ class SwaggerConfig {
     fun swaggerApi(): OpenAPI = OpenAPI()
         .components(
             Components()
-            // 여기부터 추가 부분
             .addSecuritySchemes(SECURITY_SCHEME_NAME, SecurityScheme()
                 .name(SECURITY_SCHEME_NAME)
                 .type(SecurityScheme.Type.HTTP)

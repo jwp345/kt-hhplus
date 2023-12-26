@@ -18,4 +18,15 @@ class WaitOrderRepositoryImpl(val redissonClient: RedissonClient, val redisConfi
             redissonClient.getAtomicLong(redisConfig.waitOrderKey).incrementAndGet()
         }
     }
+
+    override fun findWaitOrderByUuid(uuid: Long): Long? {
+        return redissonClient.getMap<Long, Long>(redisConfig.waitOrderMapKey)[uuid]
+    }
+
+    @Retryable(value = [org.redisson.client.RedisTimeoutException::class],
+        maxAttempts = 2, backoff = Backoff(delay = 2000)
+    )
+    override fun save(uuid: Long, order : Long) {
+        redissonClient.getMap<Long, Long>(redisConfig.waitOrderMapKey)[uuid] = order
+    }
 }

@@ -20,6 +20,9 @@ class SecurityConfig(private val tokenProvider: TokenProvider) {
             csrf {
                 disable()
             }
+            cors {
+                disable()
+            }
             headers {
                 frameOptions {
                     sameOrigin = true
@@ -30,8 +33,10 @@ class SecurityConfig(private val tokenProvider: TokenProvider) {
             }
             authorizeRequests {
                 authorize("/swagger-ui/**", permitAll)
+                authorize("/v3/api-docs/**", permitAll)
+                authorize("/swagger-ui.html", permitAll)
                 authorize("/api/v1/token", permitAll)
-                authorize(anyRequest, "auth_booking")
+                authorize(anyRequest, hasAuthority("auth_booking"))
             }
             sessionManagement {
                 sessionCreationPolicy = SessionCreationPolicy.STATELESS
@@ -43,4 +48,6 @@ class SecurityConfig(private val tokenProvider: TokenProvider) {
         )
         return http.build()!!
     }
+
+
 }

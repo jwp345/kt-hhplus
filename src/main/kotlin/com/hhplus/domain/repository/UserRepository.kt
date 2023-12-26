@@ -5,5 +5,4 @@ import com.hhplus.domain.entity.User
 
 interface UserRepository {
     fun findByUuid(uuid: Long) : User?
-    fun isValidUuid(uuid: Long) : Boolean
 }

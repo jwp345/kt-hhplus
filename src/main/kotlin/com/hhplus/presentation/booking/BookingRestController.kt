@@ -2,6 +2,8 @@ package com.hhplus.presentation.booking
 
 import com.hhplus.presentation.ApiResponse
 import com.hhplus.application.BookingFacade
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -32,12 +34,13 @@ class BookingRestController (val bookingFacade: BookingFacade){
 
     @PostMapping("/seat/reservation")
     fun reserveSeat(@RequestBody reservationCommand: ReservationCommand) : ApiResponse<ReservationResponse> {
+        val uuid = (SecurityContextHolder.getContext().authentication.principal as UserDetails).username.toLong()
         return bookingFacade.reserveSeat(seatId = reservationCommand.seatId, bookingDate = reservationCommand.date,
-            uuid = reservationCommand.uuid).let { booking ->
+            uuid = uuid).let { booking ->
             ApiResponse.ok(
                 ReservationResponse(
                     seatId = booking.seatId, reservedDate = LocalDateTime.now(),
-                    userId = reservationCommand.uuid, concertDate = booking.bookingDate
+                    uuid = uuid, bookingDate = booking.bookingDate
                 )
             )
         }

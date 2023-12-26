@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import java.sql.Timestamp
@@ -36,15 +37,12 @@ class TokenProvider(val waitOrderRepository: WaitOrderRepository) {
             "order" to userOrder,
             "auth" to auth
         )
-
+        waitOrderRepository.save(uuid = uuid, order = userOrder)
         return WaitToken(
             uuid = uuid, order = userOrder, Jwts.builder()
                 .signWith(
-                    SecretKeySpec(
-                        secretKey.toByteArray(),
-                        SignatureAlgorithm.HS512.jcaName
-                    )
-                ) // HS512 알고리즘을 사용하여 secretKey를 이용해 서명
+                    key, SignatureAlgorithm.HS256
+                )
                 .setSubject("Waiting Job Token")   // JWT 토큰 제목
                 .setClaims(claims)
                 .setIssuedAt(Timestamp.valueOf(LocalDateTime.now()))    // JWT 토큰 발급 시간
@@ -60,15 +58,18 @@ class TokenProvider(val waitOrderRepository: WaitOrderRepository) {
     fun getAuthentication(token: String): Authentication {
         val claims: Claims = getClaims(token)
 
-        val userId = claims["uuid"] ?: throw RuntimeException("잘못된 토큰입니다.")
+        val uuid = claims["uuid"] ?: throw RuntimeException("잘못된 토큰입니다.")
         claims["order"] ?: throw RuntimeException("잘못된 토큰입니다.")
         if(claims["auth"] == null || !claims["auth"]?.equals(auth)!!) {
             throw RuntimeException("잘못된 토큰입니다.")
         }
 
-        val principal: UserDetails = CustomUser(userId.toString().toLong(), claims.subject, "", authorities)
+        val authorities: Collection<GrantedAuthority> = (auth)
+            .split(",")
+            .map { SimpleGrantedAuthority(it) }
 
-        SecurityContextHolder.getContext().authentication.authorities
+        val principal: UserDetails = User(uuid.toString(), "", authorities)
+
         return UsernamePasswordAuthenticationToken(principal, "", authorities)
     }
 
@@ -77,8 +78,10 @@ class TokenProvider(val waitOrderRepository: WaitOrderRepository) {
      */
     fun validateToken(token: String): Boolean {
         try {
-            getClaims(token)
-            return true
+            val claims = getClaims(token)
+            val uuid = claims["uuid"].toString().toLong()
+            val order = claims["order"].toString().toLong()
+            return waitOrderRepository.findWaitOrderByUuid(uuid = uuid) == order
         } catch (e: Exception) {
             when (e) {
                 is SecurityException -> {}  // Invalid JWT Token

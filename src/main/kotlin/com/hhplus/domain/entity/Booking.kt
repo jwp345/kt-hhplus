@@ -11,7 +11,7 @@ import jakarta.persistence.UniqueConstraint
 
 @Entity
 @Table(name = "booking", uniqueConstraints = [
-    UniqueConstraint(name = "UniqueSeatIdAndConcertDate", columnNames = ["seat_id","concert_date"])
+    UniqueConstraint(name = "UniqueSeatIdAndConcertDate", columnNames = ["seat_id","booking_date"])
 ])
 final class Booking(seatId : Int, bookingDate : String, status : BookingStatusCode, price : Long) : BaseEntity(){
     @Id
