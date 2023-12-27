@@ -26,6 +26,10 @@
     + http keep-alive 시간보다 짧게 가져가자
     + 보통 keep-alive 시간이 5초이므로 보다 짧게 4초까지 락 대기 시간 설정
 
++ 알게 된 점
+  + given(ticketRepository.getLockAndReserveMap().mapCache.contains(any(ConcertInfo::class.java)))
+    .willReturn(true) -> 이렇게 junt + bdd로 테스트 할 경우 mapCache가 null을 반환해 테스트가 안되지만,
+  + every { ticketRepository.getLockAndReserveMap().mapCache.contains(any()) } returns false -> mockk로 테스트 할 경우는 된다
 
 참조: https://www.baeldung.com/java-generating-time-based-uuids,
 https://ssdragon.tistory.com/162

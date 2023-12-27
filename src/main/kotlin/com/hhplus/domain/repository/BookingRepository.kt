@@ -7,5 +7,7 @@ interface BookingRepository {
 
     fun getSeatIdsByBookingDate(bookingDate: String, availableCode: Int) : List<Booking>
 
-    fun getIdAndPricesBySeatIdAndBookingDateAndStatus(seatId: Int, bookingDate: String, availableCode: Int) : List<Booking>
+    fun getBookingBySeatIdAndBookingDateAndStatus(seatId: Int, bookingDate: String, availableCode: Int) : List<Booking>
+
+    fun updateStatusBySeatIdAndBookingDate(bookingDate: String, seatId: Int, availableCode: Int) : Int
 }

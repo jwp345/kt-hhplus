@@ -30,7 +30,7 @@ class BookingReader(val bookingRepository: BookingRepository, val ticketReposito
     fun read(bookingDate: String, seatId: Int) : List<Booking> {
         checkSeatId(seatId = seatId)
         checkBookingDate(bookingDate = bookingDate)
-        return bookingRepository.getIdAndPricesBySeatIdAndBookingDateAndStatus(seatId = seatId,
+        return bookingRepository.getBookingBySeatIdAndBookingDateAndStatus(seatId = seatId,
             bookingDate = bookingDate, availableCode = BookingStatusCode.AVAILABLE.code)
     }
 
