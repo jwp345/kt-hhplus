@@ -1,6 +1,6 @@
 package com.hhplus.component
 
-import com.hhplus.infrastructure.exception.InvalidTokenAuthenticationException
+import com.hhplus.domain.exception.InvalidTokenAuthenticationException
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Component

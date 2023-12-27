@@ -1,6 +1,6 @@
 package com.hhplus.presentation
 
-import com.hhplus.infrastructure.exception.InvalidException
+import com.hhplus.domain.exception.InvalidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 

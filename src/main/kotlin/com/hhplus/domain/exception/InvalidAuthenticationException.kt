@@ -1,4 +1,4 @@
-package com.hhplus.infrastructure.exception
+package com.hhplus.domain.exception
 
 class InvalidAuthenticationException : InvalidException() {
     override val code: Int = 4005

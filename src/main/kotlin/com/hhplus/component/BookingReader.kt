@@ -4,8 +4,8 @@ import com.hhplus.domain.entity.Booking
 import com.hhplus.domain.info.ConcertInfo
 import com.hhplus.domain.repository.BookingRepository
 import com.hhplus.domain.repository.TicketRepository
-import com.hhplus.infrastructure.exception.InvalidDateException
-import com.hhplus.infrastructure.exception.InvalidSeatIdException
+import com.hhplus.domain.exception.InvalidDateException
+import com.hhplus.domain.exception.InvalidSeatIdException
 import com.hhplus.presentation.booking.BookingStatusCode
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime

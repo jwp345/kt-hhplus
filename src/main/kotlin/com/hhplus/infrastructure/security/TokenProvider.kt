@@ -73,16 +73,13 @@ class TokenProvider(val waitOrderRepository: WaitOrderRepository) {
         return UsernamePasswordAuthenticationToken(principal, "", authorities)
     }
 
-    /**
-     * Token 검증
-     */
     fun validateToken(token: String): Boolean {
         try {
             val claims = getClaims(token)
             val uuid = claims["uuid"].toString().toLong()
             val order = claims["order"].toString().toLong()
             return waitOrderRepository.findWaitOrderByUuid(uuid = uuid) == order
-        } catch (e: Exception) {
+        } catch (e: Exception) { // exception 발생 시 403
             when (e) {
                 is SecurityException -> {}  // Invalid JWT Token
                 is MalformedJwtException -> {}  // Invalid JWT Token
@@ -91,7 +88,6 @@ class TokenProvider(val waitOrderRepository: WaitOrderRepository) {
                 is IllegalArgumentException -> {}   // JWT claims string is empty
                 else -> {}  // else
             }
-            println(e.message)
         }
         return false
     }

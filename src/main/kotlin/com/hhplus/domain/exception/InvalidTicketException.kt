@@ -1,4 +1,4 @@
-package com.hhplus.infrastructure.exception
+package com.hhplus.domain.exception
 
 class InvalidTicketException : InvalidException(){
     override val code: Int = 4004

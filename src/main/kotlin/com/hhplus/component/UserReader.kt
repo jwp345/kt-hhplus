@@ -1,6 +1,6 @@
 package com.hhplus.component
 
-import com.hhplus.infrastructure.exception.InvalidAuthenticationException
+import com.hhplus.domain.exception.InvalidAuthenticationException
 import com.hhplus.domain.entity.User
 import com.hhplus.domain.repository.UserRepository
 import org.springframework.stereotype.Component

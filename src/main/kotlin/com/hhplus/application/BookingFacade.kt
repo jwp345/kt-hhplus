@@ -8,11 +8,6 @@ import org.springframework.stereotype.Service
 @Service
 class BookingFacade (val bookingReader: BookingReader, val bookingProcessor: BookingProcessor) {
 
-    /* TODO : 캐시(예약) 이력을 어떻게 쌓을 것인가?
-        * 일정 시간마다 스케줄러 돌려서 배치성으로 실행해야 하나?
-        * OR 이벤트 방식으로 처리하여 비동기로 실행시킬까?
-    * */
-
     fun findDatesAvailable(seatId : Int) : List<Booking> {
         return bookingReader.read(seatId = seatId)
     }
