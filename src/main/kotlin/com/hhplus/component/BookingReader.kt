@@ -1,10 +1,10 @@
 package com.hhplus.component
 
 import com.hhplus.domain.entity.Booking
+import com.hhplus.domain.exception.InvalidBookingDateException
 import com.hhplus.domain.info.ConcertInfo
 import com.hhplus.domain.repository.BookingRepository
 import com.hhplus.domain.repository.TicketRepository
-import com.hhplus.domain.exception.InvalidDateException
 import com.hhplus.domain.exception.InvalidSeatIdException
 import com.hhplus.presentation.booking.BookingStatusCode
 import org.springframework.stereotype.Component
@@ -38,7 +38,7 @@ class BookingReader(val bookingRepository: BookingRepository, val ticketReposito
         try {
             return LocalDateTime.parse(bookingDate, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
         } catch (e: Exception) {
-            throw InvalidDateException()
+            throw InvalidBookingDateException()
         }
     }
 
@@ -49,7 +49,7 @@ class BookingReader(val bookingRepository: BookingRepository, val ticketReposito
     }
 
     private fun isReserved(seatId: Int, bookingDate: String): Boolean {
-        val cacheMap = ticketRepository.getLockAndReserveMap().mapCache
-        return cacheMap.contains(ConcertInfo(seatId = seatId, date = bookingDate))
+        return ticketRepository.getLockAndReserveMap()
+            .mapCache.contains(ConcertInfo(seatId = seatId, date = bookingDate))
     }
 }

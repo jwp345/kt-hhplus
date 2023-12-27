@@ -36,8 +36,6 @@ internal class UserReaderTest : AnnotationSpec() {
         val userRepository = mockk<UserRepository>()
         val userReader = UserReader(userRepository)
 
-        val user = User(balance = 50, name = "jaewon")
-
         every { userRepository.findByUuid(uuid) } returns null
 
         // When, Then

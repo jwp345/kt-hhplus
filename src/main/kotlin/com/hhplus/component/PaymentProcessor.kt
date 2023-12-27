@@ -15,13 +15,13 @@ class PaymentProcessor(val ticketRepository: TicketRepository, val paymentReposi
     val userReader: UserReader, val waitOrderRepository: WaitOrderRepository, val bookingRepository: BookingRepository) {
 
     suspend fun pay(seatId : Int, uuid : Long, bookingDate : String) : Payment {
-        val payment = Payment(uuid = uuid, seatId = seatId, bookingDate = bookingDate,
-            price = ticketRepository.getTicketByConcertInfo(seatId = seatId, bookingDate= bookingDate,
-                user = userReader.read(uuid = uuid)).price)
         waitOrderRepository.delete(uuid)
         bookingRepository.updateStatusBySeatIdAndBookingDate(bookingDate = bookingDate, seatId = seatId
             , availableCode = BookingStatusCode.CONFIRMED.code)
 
+        val payment = Payment(uuid = uuid, seatId = seatId, bookingDate = bookingDate,
+            price = ticketRepository.getTicketByConcertInfo(seatId = seatId, bookingDate= bookingDate,
+                user = userReader.read(uuid = uuid)).price)
         coroutineScope {
             launch { paymentRepository.save(payment) }
         }
