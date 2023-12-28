@@ -1,15 +1,19 @@
 # kt-hhplus
 ## 항해 플러스 3기 프로젝트 기록소
 + 할 일들 List up
-  + 트랜잭셔널 어노테이션 및 bdd junit을 활용한 테스트 추가
   + 결제 시 중복 결제를 방지하려면 어떻게 해야할까? 낙관적 락?
   + 중복 토큰 생성 방지를 어떻게 처리할 것인가?(만약 사용자가 새로고침 등을 통해 토큰 생성 요청을 다시 했을 경우 초기화하고 재생성된 토큰을 주는 게 맞는것 같은데... 그럼 몇초동안만 토큰 데이터를 잡고 있어서 일정시간동안 중복생성만 방지한다?)
-  + 만약 JWT로 구현할 경우, 적절한 토큰 만료 시간은 이벤트 기간일까요?
-  + 레디스의 락 획득 시도 같은 경우는 재시도로직을 걸어놓았는데, db에서도 재시도 로직은 필요할까요? 필요하다면 락 획득을 해야하는 곳만?
-  + save() 메소드를 선언하여 jpa 내에서 업데이트를 구현하는게 좋나 아니면 @Query로 직접 update문을 작성하는게 좋을까요?
-  + 처리율 제한 위해 RateLimiter? 어떻게 구현할 것인가?
+  + 처리율 제한 위해 레디스 RateLimiter를 쓰면서 redis에 atomic 변수 하나 두고 그 변수하나만 관리해서 들어오는 요청 제한 하고 그 숫자 이하를 가진 순서만 오도록 필터에서 거른다?
   + 예약 이력도 쌓을 것인가?
   + db 적재 실패나 redis 적재 실패 시 로그 남기기 등 로그 필요한 곳에 로깅하기
+  
+
++ 질문할 사항들
+  + 만약 JWT로 구현할 경우, 적절한 토큰 만료 시간은 이벤트 기간일까요?
+  + 레디스의 락 획득 시도 같은 경우는 재시도로직을 걸어놓았는데, db에서도 재시도 로직은 필요할까요? 필요하다면 락 획득을 해야하는 곳만?
+  + Transactional 어노테이션을 최대한 지양하는게 좋은지? 저번에 코치님께서 최대한 repository에만 트랜잭션을 걸고 보상 트랜잭션으로 처리해준다는 걸 듣고 궁금해짐(현재는 모두 보상 트랜잭션을 구현함)
+  + 업데이트 로직 처리할 때 save() 메소드를 선언하여 jpa 내에서 변경 감지로 업데이트를 구현하는게 좋나 아니면 @Query로 직접 update문을 작성하는게 좋을까요?
+  + 결제를 구현할 때 결제 이력이 실패하면 결제 자체를 취소시키는 게 올바른 방향이 아닌 것 같은데, 그렇다면 결제 이력이 실패했을 경우 로그로만 남기는 게 좋을까요?
 
 
 + 주요 고민들
@@ -31,6 +35,8 @@
   + given(ticketRepository.getLockAndReserveMap().mapCache.contains(any(ConcertInfo::class.java)))
     .willReturn(true) -> 이렇게 junt + bdd로 테스트 할 경우 mapCache가 null을 반환해 테스트가 안되지만,
   + every { ticketRepository.getLockAndReserveMap().mapCache.contains(any()) } returns false -> mockk로 테스트 할 경우는 된다
+  + 결론 : mockk가 좀 더 파워풀하다.
+
 
 참조: https://www.baeldung.com/java-generating-time-based-uuids,
 https://ssdragon.tistory.com/162

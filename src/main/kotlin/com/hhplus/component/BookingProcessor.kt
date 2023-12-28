@@ -1,6 +1,7 @@
 package com.hhplus.component
 
 import com.hhplus.domain.entity.Booking
+import com.hhplus.domain.exception.FailedReserveException
 import com.hhplus.domain.info.ConcertInfo
 import com.hhplus.domain.info.TicketInfo
 import com.hhplus.domain.repository.TicketRepository
@@ -17,8 +18,15 @@ class BookingProcessor(val ticketRepository: TicketRepository) {
         }
 
         val booking : Booking = bookings[0]
-        val concertInfo = ConcertInfo(seatId = booking.seatId, date = booking.bookingDate)
-        ticketRepository.saveReserveMap(concertInfo, TicketInfo(uuid = uuid, price = booking.price), 300, TimeUnit.SECONDS)
+        try {
+            ticketRepository.saveReserveMap(
+                concertInfo = ConcertInfo(seatId = booking.seatId, date = booking.bookingDate),
+                ticketInfo = TicketInfo(uuid = uuid, price = booking.price),
+                ttl = 300, timeUnit = TimeUnit.SECONDS
+            )
+        } catch (e : Exception) {
+            throw FailedReserveException()
+        }
         return booking
     }
 }

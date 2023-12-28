@@ -11,7 +11,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-internal class BookingReaderTest{
+internal class BookingReaderTest {
 
     private val bookingRepository : BookingRepository = mockk<BookingRepository>()
 
@@ -36,7 +36,6 @@ internal class BookingReaderTest{
     @Test
     fun `가능한 날짜가 있으면 반환한다`() {
         every { ticketRepository.getLockAndReserveMap().mapCache.contains(any()) } returns false
-
         assertThat(bookingReader.read(seatId = seatId).size).isEqualTo(2)
     }
 
@@ -46,6 +45,4 @@ internal class BookingReaderTest{
         every { ticketRepository.getLockAndReserveMap().mapCache.contains(ConcertInfo(seatId = seatId, date = bookingDateSec)) } returns true
         assertThat(bookingReader.read(seatId = seatId).size).isEqualTo(1)
     }
-
-
 }
