@@ -3,11 +3,12 @@ package com.hhplus.service.booking
 import com.hhplus.application.BookingFacade
 import com.hhplus.presentation.booking.BookingStatusCode
 import com.hhplus.domain.entity.Booking
-import com.hhplus.domain.exception.AlreadyReservationException
-import com.hhplus.domain.exception.InvalidTicketException
-import com.hhplus.domain.repository.BookingRepository
+import com.hhplus.domain.exception.*
+import com.hhplus.domain.info.ConcertInfo
+import com.hhplus.domain.repository.TicketRepository
 import com.hhplus.infrastructure.config.RedisConfig
 import com.hhplus.infrastructure.persistence.BookingRepositoryImpl
+import com.hhplus.infrastructure.persistence.TicketRepositoryImpl
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.TestInstance
 import org.redisson.api.RedissonClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import java.lang.IllegalArgumentException
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
@@ -37,6 +37,9 @@ internal class BookingFacadeTest {
     @Autowired
     private lateinit var redisConfig: RedisConfig
 
+    @Autowired
+    private lateinit var ticketRepository: TicketRepository
+
     @BeforeAll
     internal fun init() {
         redissonClient.getMapCache<String, Long>(redisConfig.cacheReserveKey).clear()
@@ -52,17 +55,17 @@ internal class BookingFacadeTest {
 
     @Test
     fun `1~50 사이의 숫자 아닌 인풋 테스트`() {
-        assertThrows(IllegalArgumentException::class.java) {
+        assertThrows(InvalidSeatIdException::class.java) {
             bookingFacade.findDatesAvailable(51)
         }
-        assertThrows(IllegalArgumentException::class.java) {
+        assertThrows(InvalidSeatIdException::class.java) {
             bookingFacade.findDatesAvailable(0)
         }
     }
 
     @Test
     fun `유효한 날짜 아닌 인풋 테스트`() {
-        assertThrows(IllegalArgumentException::class.java) {
+        assertThrows(InvalidBookingDateException::class.java) {
             bookingFacade.findSeatsAvailable("12")
         }
     }
@@ -76,7 +79,7 @@ internal class BookingFacadeTest {
 
     @Test
     fun `예약 시 이미 예약이 되어 있다면 오류를 발생`() {
-        assertThrows(AlreadyReservationException::class.java) {
+        assertThrows(FailedReserveException::class.java) {
             bookingFacade.reserveSeat(seatId = 1, bookingDate = "2023-12-13 15:30", uuid = 1)
             bookingFacade.reserveSeat(seatId = 1, bookingDate = "2023-12-13 15:30", uuid = 1)
         }
@@ -89,6 +92,13 @@ internal class BookingFacadeTest {
         } catch (_: Exception) {}
         assertThat(bookingFacade.findSeatsAvailable("2023-12-13 15:30").size).isZero()
         assertThat(bookingFacade.findDatesAvailable(1).size).isZero()
+    }
+
+    @Test
+    fun `예약이 가능하면 예약을 성공한다`() {
+        bookingFacade.reserveSeat(seatId = 1, bookingDate = "2023-12-13 15:30", uuid = 1)
+        assertThat(ticketRepository.getLockAndReserveMap()
+            .mapCache.contains(ConcertInfo(seatId = 1, date = "2023-12-13 15:30")))
     }
 
     @Test

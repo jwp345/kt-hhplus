@@ -40,9 +40,6 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    implementation("io.jsonwebtoken:jjwt-api:0.11.2")
-    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.2")
-    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.2")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
     implementation ("org.mariadb.jdbc:mariadb-java-client:2.7.4")
     implementation("org.springframework.boot:spring-boot-devtools")
@@ -51,7 +48,6 @@ dependencies {
     testImplementation ("io.kotest:kotest-assertions-core:5.5.5")
     testImplementation("io.mockk:mockk:1.13.4")
     implementation ("io.hypersistence:hypersistence-utils-hibernate-60:3.5.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 }
 
 tasks.withType<KotlinCompile> {

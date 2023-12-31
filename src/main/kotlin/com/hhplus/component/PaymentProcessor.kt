@@ -1,42 +1,39 @@
 package com.hhplus.component
 
 import com.hhplus.domain.entity.Payment
-import com.hhplus.domain.exception.FailedPaymentException
+import com.hhplus.domain.info.TicketInfo
 import com.hhplus.domain.repository.BookingRepository
 import com.hhplus.domain.repository.TicketRepository
-import com.hhplus.domain.repository.WaitOrderRepository
+import com.hhplus.domain.repository.ValidWaitTokenRepository
 import com.hhplus.infrastructure.persistence.PaymentRepositoryImpl
+import com.hhplus.infrastructure.security.WaitToken
 import com.hhplus.presentation.booking.BookingStatusCode
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
+import jakarta.transaction.Transactional
 import org.springframework.stereotype.Component
 
 @Component
 class PaymentProcessor(val ticketRepository: TicketRepository, val paymentRepository: PaymentRepositoryImpl,
-    val userReader: UserReader, val waitOrderRepository: WaitOrderRepository, val bookingRepository: BookingRepository) {
+    val userReader: UserReader, val validWaitTokenRepository: ValidWaitTokenRepository, val bookingRepository: BookingRepository) {
 
-    suspend fun pay(seatId : Int, uuid : Long, bookingDate : String) : Payment {
-        val tempOrder : Long = waitOrderRepository.findWaitOrderByUuid(uuid = uuid)!!
-        try {
-            waitOrderRepository.delete(uuid)
-            bookingRepository.updateStatusBySeatIdAndBookingDate(
-                bookingDate = bookingDate, seatId = seatId, availableCode = BookingStatusCode.CONFIRMED.code
-            )
-        } catch (e : Exception) {
-            waitOrderRepository.save(uuid = uuid, order = tempOrder)
-            throw FailedPaymentException()
-        }
-        val payment = Payment(
-            uuid = uuid, seatId = seatId, bookingDate = bookingDate,
-            price = ticketRepository.getTicketByConcertInfo(
-                seatId = seatId, bookingDate = bookingDate,
-                user = userReader.read(uuid = uuid)
-            ).price
-        )
-        coroutineScope {
-            launch { paymentRepository.save(payment) }
+    @Transactional
+    fun pay(seatId : Int, uuid : Long, bookingDate : String, waitToken : WaitToken) : Payment {
+        userReader.read(uuid = uuid).let { user ->
+            val ticketInfo: TicketInfo =
+                ticketRepository.getTicket(seatId = seatId, bookingDate = bookingDate, user = user)
+
+            validWaitTokenRepository.pop(waitToken)
+
+            bookingRepository.findBySeatIdAndBookingDateAndStatus(
+                bookingDate = bookingDate, seatId = seatId, availableCode = BookingStatusCode.AVAILABLE.code
+            )[0].apply {
+                status = BookingStatusCode.CONFIRMED.code
+            }
+
+            return Payment(
+                uuid = uuid, seatId = seatId, bookingDate = bookingDate,
+                price = ticketInfo.price
+            ).also(paymentRepository::save) // 이벤트 pub 방식으로 변경하자
         }
 
-        return payment
     }
 }

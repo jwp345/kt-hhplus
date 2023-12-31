@@ -18,9 +18,8 @@ class RedisConfig {
     var port: Int = 0
     final val reserveLockName : String = "reserve-seat-lock"
     final val cacheReserveKey : String = "seat-reservation"
-    final val waitOrderLockName : String = "wait-order-lock"
-    final val waitOrderKey : String = "wait-order"
-    final val waitOrderMapKey : String = "wait-order-map"
+    final val waitQueueName : String = "wait-queue"
+    final val validSetName : String = "wait-set"
 
     @Bean(destroyMethod = "shutdown")
     fun redissonClient(): RedissonClient {

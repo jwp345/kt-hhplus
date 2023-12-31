@@ -1,7 +1,8 @@
 package com.hhplus.infrastructure.config
 
-import com.hhplus.infrastructure.security.JwtAuthenticationFilter
+import com.hhplus.infrastructure.security.WaitTokenFilter
 import com.hhplus.infrastructure.security.TokenProvider
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -14,6 +15,9 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 @Configuration
 @EnableWebSecurity
 class SecurityConfig(private val tokenProvider: TokenProvider) {
+    @Value("\${waitToken.auth.name}")
+    private lateinit var waitTokenAuth : String
+
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http.invoke {
@@ -36,14 +40,14 @@ class SecurityConfig(private val tokenProvider: TokenProvider) {
                 authorize("/v3/api-docs/**", permitAll)
                 authorize("/swagger-ui.html", permitAll)
                 authorize("/api/v1/token", permitAll)
-                authorize(anyRequest, hasAuthority("auth_booking"))
+                authorize(anyRequest, hasAuthority(waitTokenAuth))
             }
             sessionManagement {
                 sessionCreationPolicy = SessionCreationPolicy.STATELESS
             }
         }
         http.addFilterAt(
-            JwtAuthenticationFilter(tokenProvider),
+            WaitTokenFilter(tokenProvider),
                 BasicAuthenticationFilter::class.java
         )
         return http.build()!!

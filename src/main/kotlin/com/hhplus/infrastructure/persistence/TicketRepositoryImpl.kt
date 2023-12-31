@@ -10,8 +10,6 @@ import com.hhplus.domain.exception.AlreadyReservationException
 import com.hhplus.domain.exception.InvalidTicketException
 import com.hhplus.domain.exception.NotEnoughMoneyException
 import org.redisson.api.RedissonClient
-import org.springframework.retry.annotation.Backoff
-import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
 import java.util.concurrent.TimeUnit
 
@@ -19,15 +17,13 @@ import java.util.concurrent.TimeUnit
 class TicketRepositoryImpl(val redissonClient: RedissonClient
 , val redisConfig: RedisConfig) : TicketRepository {
 
-    @Retryable(value = [org.redisson.client.RedisTimeoutException::class],
-        maxAttempts = 2, backoff = Backoff(delay = 2000)
-    )
+    // 락도 aop로 만들까?
     override fun getLockAndReserveMap() : ReserveCacheInfo {
         return ReserveCacheInfo(lock = redissonClient.getLock(redisConfig.reserveLockName),
             mapCache = redissonClient.getMapCache(redisConfig.cacheReserveKey))
     }
 
-    override fun getTicketByConcertInfo(seatId : Int, bookingDate : String, user : User) : TicketInfo{
+    override fun getTicket(seatId : Int, bookingDate : String, user : User) : TicketInfo{
         return getLockAndReserveMap().mapCache.let { reserveMap ->
             reserveMap[ConcertInfo(seatId, bookingDate)]
                 ?: throw InvalidTicketException()
@@ -41,8 +37,6 @@ class TicketRepositoryImpl(val redissonClient: RedissonClient
         }
     }
 
-    @Retryable(value = [org.redisson.client.RedisTimeoutException::class],
-        maxAttempts = 2, backoff = Backoff(delay = 2000))
     override fun saveReserveMap(concertInfo: ConcertInfo, ticketInfo: TicketInfo, ttl: Long, timeUnit: TimeUnit) {
         getLockAndReserveMap().run {
             lock.lock(4, TimeUnit.SECONDS)

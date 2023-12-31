@@ -8,7 +8,7 @@ import io.swagger.v3.oas.models.security.SecurityScheme
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
-private const val SECURITY_SCHEME_NAME = "authorization"
+private const val SECURITY_SCHEME_NAME = "X-WAIT-TOKEN"
 
 @Configuration
 class SwaggerConfig {
@@ -18,9 +18,9 @@ class SwaggerConfig {
             Components()
             .addSecuritySchemes(SECURITY_SCHEME_NAME, SecurityScheme()
                 .name(SECURITY_SCHEME_NAME)
-                .type(SecurityScheme.Type.HTTP)
-                .scheme("bearer")
-                .bearerFormat("JWT")))
+                .type(SecurityScheme.Type.APIKEY)
+                .`in`(SecurityScheme.In.HEADER))
+        )
         .addSecurityItem(SecurityRequirement().addList(SECURITY_SCHEME_NAME))
         .info(
             Info()

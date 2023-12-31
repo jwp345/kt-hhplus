@@ -30,7 +30,7 @@ internal class BookingReaderTest {
             Booking(seatId = seatId, bookingDate = bookingDateSec, status = BookingStatusCode.AVAILABLE, price = 1000L)
         )
 
-        every { bookingRepository.getDatesBySeatId(seatId = seatId, availableCode = BookingStatusCode.AVAILABLE.code) } returns bookingList
+        every { bookingRepository.findBySeatIdAndStatus(seatId = seatId, availableCode = BookingStatusCode.AVAILABLE.code) } returns bookingList
     }
 
     @Test

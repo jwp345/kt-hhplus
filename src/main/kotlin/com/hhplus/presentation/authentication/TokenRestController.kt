@@ -14,9 +14,9 @@ class TokenRestController(val tokenProvider : TokenProvider) {
 
     @PostMapping("")
     fun generateToken(@RequestParam(required = true) uuid: Long) : ApiResponse<WaitTokenResponse> {
-        val waitToken : WaitToken = tokenProvider.createToken(uuid = uuid)
-        return ApiResponse.ok(WaitTokenResponse(userUUID = waitToken.uuid, waitOrder = waitToken.order,
-            token = waitToken.token))
+        tokenProvider.createToken(uuid = uuid).let { token ->
+            return ApiResponse.ok(WaitTokenResponse(token = token))
+        }
     }
 
 }

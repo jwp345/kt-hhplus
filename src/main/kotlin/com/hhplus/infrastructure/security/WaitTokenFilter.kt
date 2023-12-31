@@ -3,11 +3,14 @@ package com.hhplus.infrastructure.security
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import org.springframework.http.HttpHeaders
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.filter.OncePerRequestFilter
+import java.io.ByteArrayInputStream
+import java.io.ObjectInputStream
+import java.util.*
 
-class JwtAuthenticationFilter(private val tokenProvider: TokenProvider)
+
+class WaitTokenFilter(private val tokenProvider: TokenProvider)
     : OncePerRequestFilter() {
 
     override fun doFilterInternal(
@@ -15,7 +18,7 @@ class JwtAuthenticationFilter(private val tokenProvider: TokenProvider)
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val token = parseBearerToken(request)
+        val token : WaitToken? = decodeToken(request)
 
         if (token != null && tokenProvider.validateToken(token)) {
             val authentication = tokenProvider.getAuthentication(token)
@@ -24,7 +27,16 @@ class JwtAuthenticationFilter(private val tokenProvider: TokenProvider)
         filterChain.doFilter(request, response)
     }
 
-    private fun parseBearerToken(request: HttpServletRequest) = request.getHeader(HttpHeaders.AUTHORIZATION)
-        .takeIf { it?.startsWith("Bearer ", true) ?: false }?.substring(7)
+    private fun decodeToken(request: HttpServletRequest): WaitToken? {
+        request.getHeader("X-WAIT-TOKEN")
+            .let { token ->
+                if(token == null) return null
+                val inputStream = ByteArrayInputStream(Base64.getDecoder().decode(token))
+
+                ObjectInputStream(inputStream).use {
+                    return it.readObject() as? WaitToken
+                }
+            }
+    }
 
 }

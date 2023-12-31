@@ -8,6 +8,6 @@ import java.util.concurrent.TimeUnit
 
 interface TicketRepository {
     fun getLockAndReserveMap() : ReserveCacheInfo
-    fun getTicketByConcertInfo(seatId : Int, bookingDate : String, user : User) : TicketInfo
+    fun getTicket(seatId : Int, bookingDate : String, user : User) : TicketInfo
     fun saveReserveMap(concertInfo: ConcertInfo, ticketInfo: TicketInfo, ttl: Long, timeUnit: TimeUnit)
 }

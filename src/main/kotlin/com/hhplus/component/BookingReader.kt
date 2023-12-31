@@ -16,13 +16,13 @@ class BookingReader(val bookingRepository: BookingRepository, val ticketReposito
 
     fun read(seatId : Int) : List<Booking> {
         checkSeatId(seatId = seatId)
-        return bookingRepository.getDatesBySeatId(seatId = seatId, availableCode = BookingStatusCode.AVAILABLE.code)
+        return bookingRepository.findBySeatIdAndStatus(seatId = seatId, availableCode = BookingStatusCode.AVAILABLE.code)
             .filterNot { isReserved(seatId = seatId, bookingDate = it.bookingDate) }
     }
 
     fun read(bookingDate: String) : List<Booking> {
         checkBookingDate(bookingDate = bookingDate)
-        return bookingRepository.getSeatIdsByBookingDate(bookingDate = bookingDate,
+        return bookingRepository.findByBookingDateAndStatus(bookingDate = bookingDate,
             availableCode = BookingStatusCode.AVAILABLE.code)
             .filterNot { isReserved(seatId = it.seatId, bookingDate = bookingDate) }
     }
@@ -30,7 +30,7 @@ class BookingReader(val bookingRepository: BookingRepository, val ticketReposito
     fun read(bookingDate: String, seatId: Int) : List<Booking> {
         checkSeatId(seatId = seatId)
         checkBookingDate(bookingDate = bookingDate)
-        return bookingRepository.getBookingBySeatIdAndBookingDateAndStatus(seatId = seatId,
+        return bookingRepository.findBySeatIdAndBookingDateAndStatus(seatId = seatId,
             bookingDate = bookingDate, availableCode = BookingStatusCode.AVAILABLE.code)
     }
 

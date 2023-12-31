@@ -1,4 +1,6 @@
 package com.hhplus.infrastructure.security
 
-data class WaitToken(val uuid : Long, val order : Long, val token : String) {
-}
+import java.io.Serializable
+import java.time.LocalDateTime
+
+data class WaitToken(val uuid : Long, val order : Long, val createAt : LocalDateTime) : Serializable
