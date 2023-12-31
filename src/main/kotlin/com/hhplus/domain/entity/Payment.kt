@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 
 @Entity
 @Table(name = "payment")
-final class Payment(uuid: Long, seatId: Int, bookingDate: String, price : Long) {
+final class Payment(uuid: Long, seatId: Int, bookingDate: String, price : Long) : BaseEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id : Long ?= null

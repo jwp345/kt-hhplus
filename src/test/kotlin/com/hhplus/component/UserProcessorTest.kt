@@ -2,23 +2,24 @@ package com.hhplus.component
 
 import com.hhplus.domain.exception.FailedChargeException
 import com.hhplus.domain.repository.UserRepository
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.AnnotationSpec
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Test
-import org.mockito.BDDMockito.given
-import org.mockito.Mockito.mock
 
-internal class UserProcessorTest {
-    private val userRepository : UserRepository = mock(UserRepository::class.java)
-    private val userProcessor = UserProcessor(userRepository)
+internal class UserProcessorTest : AnnotationSpec() {
 
     @Test
-    fun `충전 실패 시 충전 실패 예외를 발생시킨다`() {
-        val uuid = 1L
-        val balance = 50L
-        given(userRepository.updateBalanceByUuid(uuid = uuid, balance = balance)).willThrow(RuntimeException())
+    fun `db 커넥션 에러 발생 시 에러 발생한다`() {
+        val uuid = 123L
+        val balance = 100L
+        val userRepository = mockk<UserRepository>()
+        val userProcessor = UserProcessor(userRepository)
+        every { userRepository.findByUuid(uuid) }.throws(RuntimeException())
 
-        assertThrows(FailedChargeException::class.java){
-            userProcessor.chargeMoney(uuid = uuid, balance = balance)
+        shouldThrow<FailedChargeException> {
+            userProcessor.chargeMoney(uuid = uuid, balance =  balance)
         }
     }
 }

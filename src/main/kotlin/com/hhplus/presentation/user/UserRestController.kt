@@ -9,19 +9,19 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/v1/user")
 class UserRestController(val userFacade: UserFacade, val userValidator: UserValidator) {
 
-    @PostMapping("/{uuid}/charge")
-    fun chargeMoney(@PathVariable uuid : Long, @RequestParam("amount") amount : Long) : ApiResponse<UserBalanceResponse> {
-        userValidator.checkTokenAndUser(userUuid = uuid)
-        return ApiResponse.ok(userFacade.chargeMoney(uuid = uuid, amount = amount)
+    @PostMapping("/charge")
+    fun chargeMoney(@RequestBody chargeMoneyCommand: ChargeMoneyCommand) : ApiResponse<UserBalanceResponse> {
+        userValidator.checkTokenAndUser(userUuid = chargeMoneyCommand.uuid)
+        return ApiResponse.ok(userFacade.chargeMoney(uuid = chargeMoneyCommand.uuid, amount = chargeMoneyCommand.amount)
             .let { user ->
             UserBalanceResponse(userName = user.name, balance = user.balance)
         })
     }
 
-    @GetMapping("/{uuid}/check/balance")
-    fun checkBalance(@PathVariable uuid: Long) : ApiResponse<UserBalanceResponse> {
-        userValidator.checkTokenAndUser(userUuid = uuid)
-        return userFacade.checkBalance(uuid = uuid).let { user ->
+    @GetMapping("/check/balance")
+    fun checkBalance(@RequestBody checkBalanceRequest: CheckBalanceRequest) : ApiResponse<UserBalanceResponse> {
+        userValidator.checkTokenAndUser(userUuid = checkBalanceRequest.uuid)
+        return userFacade.checkBalance(uuid = checkBalanceRequest.uuid).let { user ->
             ApiResponse.ok(UserBalanceResponse(userName = user.name, balance = user.balance))
         }
     }

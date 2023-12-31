@@ -22,12 +22,12 @@ class TokenProvider(val waitQueueRepository: WaitQueueRepository, val validWaitT
     private lateinit var validTokenMaxsize : String
     @Value("\${waitToken.auth.name}")
     private lateinit var waitTokenAuth : String
-    private var order : AtomicLong = AtomicLong(1L)
+    private var order : AtomicLong = AtomicLong(0L)
 
     /* TODO: 중복 토큰 생성 방지 및 처리율 제한 위해(따닥 방지위해) RateLimiter? */
     fun createToken(uuid: Long): String {
         WaitToken(
-            uuid = uuid, order = this.order.getAndIncrement(), createAt = LocalDateTime.now()
+            uuid = uuid, order = this.order.incrementAndGet(), createAt = LocalDateTime.now()
         ).let { token ->
             waitQueueRepository.add(token)
             if(validWaitTokenRepository.getSize() < validTokenMaxsize.toInt()) {

@@ -5,7 +5,6 @@ import com.hhplus.component.UserValidator
 import com.hhplus.infrastructure.security.CustomUser
 import com.hhplus.presentation.ApiResponse
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping

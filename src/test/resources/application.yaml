@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://localhost:3306/test
+    username: root
+    password: root
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  jpa:
+    show_sql: true
+    hibernate:
+      ddl-auto: create
+    defer-datasource-initialization: true
+
+waitToken:
+  set:
+    max_size: 10000
+  auth:
+    name: auth-booking

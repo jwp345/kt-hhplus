@@ -48,6 +48,9 @@ dependencies {
     testImplementation ("io.kotest:kotest-assertions-core:5.5.5")
     testImplementation("io.mockk:mockk:1.13.4")
     implementation ("io.hypersistence:hypersistence-utils-hibernate-60:3.5.1")
+    testImplementation("org.testcontainers:testcontainers")
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:mariadb")
 }
 
 tasks.withType<KotlinCompile> {
