@@ -1,7 +1,9 @@
-package com.hhplus.infrastructure.security
+package com.hhplus.application
 
 import com.hhplus.domain.repository.ValidWaitTokenRepository
 import com.hhplus.domain.repository.WaitQueueRepository
+import com.hhplus.infrastructure.security.CustomUser
+import com.hhplus.infrastructure.security.WaitToken
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -29,9 +31,11 @@ class TokenProvider(val waitQueueRepository: WaitQueueRepository, val validWaitT
         WaitToken(
             uuid = uuid, order = this.order.incrementAndGet(), createAt = LocalDateTime.now()
         ).let { token ->
-            waitQueueRepository.add(token)
-            if(validWaitTokenRepository.getSize() < validTokenMaxsize.toInt()) {
+
+            if(validWaitTokenRepository.getSize() <= validTokenMaxsize.toInt()) {
                 validWaitTokenRepository.add(token)
+            } else {
+                waitQueueRepository.add(token)
             }
 
             return ByteArrayOutputStream().use { byteArrayOutputStream ->

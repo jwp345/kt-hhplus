@@ -35,14 +35,14 @@ internal class BookingReaderTest {
 
     @Test
     fun `가능한 날짜가 있으면 반환한다`() {
-        every { ticketRepository.getLockAndReserveMap().mapCache.contains(any()) } returns false
+        every { ticketRepository.getLockAndReserveMap().map.contains(any()) } returns false
         assertThat(bookingReader.read(seatId = seatId).size).isEqualTo(2)
     }
 
     @Test
     fun `예약이 있을 경우 리스트에서 뺀다`() {
-        every { ticketRepository.getLockAndReserveMap().mapCache.contains(ConcertInfo(seatId = seatId, date = bookingDateOne)) } returns false
-        every { ticketRepository.getLockAndReserveMap().mapCache.contains(ConcertInfo(seatId = seatId, date = bookingDateSec)) } returns true
+        every { ticketRepository.getLockAndReserveMap().map.contains(ConcertInfo(seatId = seatId, date = bookingDateOne)) } returns false
+        every { ticketRepository.getLockAndReserveMap().map.contains(ConcertInfo(seatId = seatId, date = bookingDateSec)) } returns true
         assertThat(bookingReader.read(seatId = seatId).size).isEqualTo(1)
     }
 }

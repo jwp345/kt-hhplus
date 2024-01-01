@@ -1,7 +1,7 @@
 package com.hhplus.presentation.authentication
 
 import com.hhplus.presentation.ApiResponse
-import com.hhplus.infrastructure.security.TokenProvider
+import com.hhplus.application.TokenProvider
 import org.springframework.web.bind.annotation.*
 
 @RestController

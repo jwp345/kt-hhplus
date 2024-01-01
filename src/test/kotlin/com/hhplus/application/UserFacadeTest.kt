@@ -1,6 +1,5 @@
-package com.hhplus.service.user
+package com.hhplus.application
 
-import com.hhplus.application.UserFacade
 import com.hhplus.component.UserReader
 import com.hhplus.domain.entity.User
 import com.hhplus.domain.repository.UserRepository

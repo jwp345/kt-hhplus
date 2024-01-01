@@ -50,6 +50,6 @@ class BookingReader(val bookingRepository: BookingRepository, val ticketReposito
 
     private fun isReserved(seatId: Int, bookingDate: String): Boolean {
         return ticketRepository.getLockAndReserveMap()
-            .mapCache.contains(ConcertInfo(seatId = seatId, date = bookingDate))
+            .map.contains(ConcertInfo(seatId = seatId, date = bookingDate))
     }
 }

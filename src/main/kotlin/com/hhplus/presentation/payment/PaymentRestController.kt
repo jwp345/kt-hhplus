@@ -15,19 +15,20 @@ import org.springframework.web.bind.annotation.RestController
 class PaymentRestController(val paymentFacade: PaymentFacade, val userValidator: UserValidator) {
 
     @PostMapping("")
-    fun payMoney(@RequestBody command : PaymentCommand) : ApiResponse<PaymentResponse> {
+    fun payMoney(@RequestBody command : PaymentCommand) : ApiResponse<List<PaymentResponse>> {
         userValidator.checkTokenAndUser(userUuid = command.uuid) // -> 어노테이션으로 빼는 거 고민
-        return paymentFacade.payMoney(uuid = command.uuid, seatId = command.seatId,
-            bookingDate = command.bookingDate, waitToken = (SecurityContextHolder.getContext().authentication.principal as CustomUser).token)
-            .let{ payment ->
+        return paymentFacade.payMoney(concertInfos = command.concertInfos,
+            waitToken = (SecurityContextHolder.getContext().authentication.principal as CustomUser).token)
+            .let{ payments ->
                 ApiResponse.ok(
-                    PaymentResponse(
+                    payments.stream().map { payment ->
+                        PaymentResponse(
                         uuid = payment.uuid,
                         seatId = payment.seatId,
                         bookingDate = payment.bookingDate,
                         cost = payment.price,
                         paymentDate = payment.paymentDate
-                    )
+                    ) }.toList()
                 )
             }
     }

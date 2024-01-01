@@ -1,6 +1,5 @@
-package com.hhplus.service.booking
+package com.hhplus.application
 
-import com.hhplus.application.BookingFacade
 import com.hhplus.presentation.booking.BookingStatusCode
 import com.hhplus.domain.entity.Booking
 import com.hhplus.domain.exception.*
@@ -8,12 +7,9 @@ import com.hhplus.domain.info.ConcertInfo
 import com.hhplus.domain.repository.TicketRepository
 import com.hhplus.infrastructure.config.RedisConfig
 import com.hhplus.infrastructure.persistence.BookingRepositoryImpl
-import com.hhplus.infrastructure.persistence.TicketRepositoryImpl
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 import org.redisson.api.RedissonClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -23,6 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 internal class BookingFacadeTest {
 
     @Autowired
@@ -48,8 +45,17 @@ internal class BookingFacadeTest {
             price = 3000)
         )
         bookingRepository.save(
+            Booking(seatId = 1, bookingDate = "2023-12-13 16:30", status = BookingStatusCode.AVAILABLE,
+                price = 3000)
+        )
+        bookingFacade.reserveSeat(seatId = 1, bookingDate = "2023-12-13 16:30", uuid = 1)
+        bookingRepository.save(
             Booking(seatId = 1, bookingDate = "2023-12-13 17:30",
             status = BookingStatusCode.CONFIRMED, price = 5000)
+        )
+        bookingRepository.save(
+            Booking(seatId = 2, bookingDate = "2023-12-13 15:30", status = BookingStatusCode.AVAILABLE,
+                price = 3000)
         )
     }
 
@@ -73,7 +79,7 @@ internal class BookingFacadeTest {
     @Test
     fun `예약 시 유효한 쿠폰의 정보 아닐 시 오류를 발생`() {
         assertThrows(InvalidTicketException::class.java) {
-            bookingFacade.reserveSeat(seatId = 1, bookingDate = "2023-12-13 16:30", uuid = 1L)
+            bookingFacade.reserveSeat(seatId = 1, bookingDate = "2023-12-13 19:30", uuid = 1L)
         }
     }
 
@@ -95,10 +101,22 @@ internal class BookingFacadeTest {
     }
 
     @Test
+    @Order(2)
     fun `예약이 가능하면 예약을 성공한다`() {
         bookingFacade.reserveSeat(seatId = 1, bookingDate = "2023-12-13 15:30", uuid = 1)
         assertThat(ticketRepository.getLockAndReserveMap()
-            .mapCache.contains(ConcertInfo(seatId = 1, date = "2023-12-13 15:30")))
+            .map.contains(ConcertInfo(seatId = 1, date = "2023-12-13 15:30")))
+    }
+
+    @Test
+    @Order(1)
+    fun `예약 가능한 날짜 조회시 조회 된다`() {
+        assertThat(bookingFacade.findDatesAvailable(seatId = 1).size).isEqualTo(1)
+    }
+
+    @Test
+    fun `예약 가능한 좌석 조회 시 조회 된다`() {
+        assertThat(bookingFacade.findSeatsAvailable(date = "2023-12-13 16:30").size).isEqualTo(0)
     }
 
     @Test
@@ -111,7 +129,7 @@ internal class BookingFacadeTest {
         repeat(10) {
             executor.submit{
                 try {
-                    bookingFacade.reserveSeat(seatId = 1, bookingDate = "2023-12-13 15:30", uuid = 1L)
+                    bookingFacade.reserveSeat(seatId = 2, bookingDate = "2023-12-13 15:30", uuid = 1L)
                 } catch (_: Exception) {
                     exceptionNum.getAndIncrement()
                 }

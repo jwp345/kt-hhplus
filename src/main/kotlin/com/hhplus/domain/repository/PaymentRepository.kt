@@ -1,5 +1,9 @@
 package com.hhplus.domain.repository
 
-interface PaymentRepository {
+import com.hhplus.domain.entity.Payment
 
+interface PaymentRepository {
+    fun save(payment: Payment)
+
+    fun findByUuid(uuid : Long) : List<Payment>
 }

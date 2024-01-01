@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import jakarta.persistence.UniqueConstraint
+import jakarta.persistence.Version
 
 @Entity
 @Table(name = "booking", uniqueConstraints = [
@@ -29,4 +30,7 @@ final class Booking(seatId : Int, bookingDate : String, status : BookingStatusCo
 
     @Column(name = "price", nullable = false) // 단위 : 원
     var price : Long = price
+
+    @Version
+    private val version : Int ?= null
 }

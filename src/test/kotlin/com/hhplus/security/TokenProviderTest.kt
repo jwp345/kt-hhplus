@@ -1,5 +1,5 @@
 package com.hhplus.security
-import com.hhplus.infrastructure.security.TokenProvider
+import com.hhplus.application.TokenProvider
 import com.hhplus.infrastructure.security.WaitToken
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*

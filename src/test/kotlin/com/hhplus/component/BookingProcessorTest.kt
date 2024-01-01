@@ -3,8 +3,6 @@ package com.hhplus.component
 import com.hhplus.domain.entity.Booking
 import com.hhplus.domain.exception.FailedReserveException
 import com.hhplus.domain.exception.InvalidTicketException
-import com.hhplus.domain.info.ConcertInfo
-import com.hhplus.domain.info.TicketInfo
 import com.hhplus.domain.repository.TicketRepository
 import com.hhplus.presentation.booking.BookingStatusCode
 import org.junit.jupiter.api.Assertions.*
@@ -13,7 +11,6 @@ import org.mockito.BDDMockito.given
 
 import org.mockito.Mockito.mock
 import org.redisson.client.RedisTimeoutException
-import java.util.concurrent.TimeUnit
 
 internal class BookingProcessorTest {
 
@@ -51,11 +48,8 @@ internal class BookingProcessorTest {
         val seatId = 1
         val uuid = 1L
         val price = 5000L
-        val concertInfo = ConcertInfo(seatId = seatId, date = date)
-        val ticketInfo = TicketInfo(uuid = uuid, price = price)
-        val ttl = 300L
-        val timeUnit = TimeUnit.SECONDS
-        given(ticketRepository.saveReserveMap(concertInfo, ticketInfo, ttl = ttl, timeUnit = timeUnit)).willThrow(RedisTimeoutException())
+
+        given(ticketRepository.getLockAndReserveMap()).willThrow(RedisTimeoutException())
 
         assertThrows(FailedReserveException::class.java) {
             bookingProcessor.reserve(listOf(Booking(
@@ -64,6 +58,22 @@ internal class BookingProcessorTest {
                 status = BookingStatusCode.AVAILABLE,
                 price = price
             )), uuid = uuid)
+        }
+    }
+
+    @Test
+    fun `이미 예약이 되어있다면 예약 실패 예외 발생`() {
+        assertThrows(FailedReserveException::class.java) {
+            bookingProcessor.reserve(
+                bookings = listOf(
+                    Booking(
+                        seatId = 1,
+                        bookingDate = "date",
+                        status = BookingStatusCode.AVAILABLE,
+                        price = 100L
+                    )
+                ), uuid = 1
+            )
         }
     }
 }

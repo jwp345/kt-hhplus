@@ -6,7 +6,6 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.AnnotationSpec
 import io.mockk.every
 import io.mockk.mockk
-import org.junit.jupiter.api.Assertions.*
 
 internal class UserProcessorTest : AnnotationSpec() {
 
