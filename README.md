@@ -18,6 +18,7 @@
     + Atomic Value or Synchronized : 인스턴스 확장될 경우 동시성 보장이 안됨
     + db의 낙관적락, 비관적 락 or 분산락
     + 예약 정보를 관리하는 데엔 분산락, 예약 정보를 저장해 놓은 Booking 테이블에는 낙관적 락을 사용함
+    + 낙관적 락을 걸지 않을 경우, 1차 캐시에 저장되는 요소 때문에 고객의 잔고에는 영향이 없으나, 이력이 동시에 이뤄진 요청만큼 생성되는 문제가 발생하므로 낙관적 락으로 해결
   + 보안을 위해 uuid를 유저를 구분하기 위한 주로 파라미터로 사용하기로 결정
     + 문제점
       + mysql(mairaDB)의 클러스터드 인덱스는 B-트리 구조로 되어 있어 항상 정렬된 상태를 유지하여 무작위 값을 인덱스로 배치하게 되면 데이터를 추가할 때마다 구조를 재배치해야하므로 성능에 영향을 미침.
@@ -43,6 +44,7 @@
     .willReturn(true) -> 이렇게 junt + bdd로 테스트 할 경우 mapCache가 null을 반환해 테스트가 안되지만,
   + every { ticketRepository.getLockAndReserveMap().mapCache.contains(any()) } returns false -> mockk로 테스트 할 경우는 된다
   + 결론 : mockk가 좀 더 파워풀하다.
+  + publishEvent()메소드를 사용하여 이벤트를 전송할 때 data class 말고 List<>() 같이 단순 래핑해서 보낼 시 제대로 메시지 리스너가 동작하지 않는다.
 
 
 참조: https://www.baeldung.com/java-generating-time-based-uuids,

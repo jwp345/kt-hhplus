@@ -12,9 +12,9 @@ import com.hhplus.domain.repository.TicketRepository
 import com.hhplus.domain.repository.ValidWaitTokenRepository
 import com.hhplus.infrastructure.security.WaitToken
 import com.hhplus.presentation.booking.BookingStatusCode
-import jakarta.transaction.Transactional
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 
 @Component
 class PaymentProcessor(val ticketRepository: TicketRepository, val userReader: UserReader,
@@ -26,7 +26,7 @@ class PaymentProcessor(val ticketRepository: TicketRepository, val userReader: U
         userReader.read(uuid = waitToken.uuid).let { user ->
             val payments : MutableList<Payment> = mutableListOf()
             var totalPrice : Long = 0
-            for(concertInfo in concertInfos) {
+            concertInfos.forEach { concertInfo ->
                 checkTicket(concertInfo = concertInfo, user = user)
                 try {
                     bookingRepository.findBySeatIdAndBookingDateAndStatus(
@@ -51,12 +51,10 @@ class PaymentProcessor(val ticketRepository: TicketRepository, val userReader: U
             user.balance -= totalPrice
 
             validWaitTokenRepository.pop(waitToken)
-            applicationEventPublisher.publishEvent(payments)
-// 이력 이벤트로 pub 하는 거 어떤 걸로 날릴지? 일단 TransactionalEventListener로 구현 해보자 + 스케줄러 깜빡하고 있었다..
+            applicationEventPublisher.publishEvent(PaymentEvent(payments = payments))
+
             return payments
         }
-
-
     }
 
     fun checkUserEnoughMoney(price: Long, balance: Long) {
