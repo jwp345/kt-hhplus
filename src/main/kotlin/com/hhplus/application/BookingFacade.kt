@@ -3,6 +3,7 @@ package com.hhplus.application
 import com.hhplus.component.BookingProcessor
 import com.hhplus.component.BookingReader
 import com.hhplus.domain.entity.Booking
+import com.hhplus.domain.exception.FailedReserveException
 import org.springframework.stereotype.Service
 
 @Service
@@ -17,9 +18,11 @@ class BookingFacade (val bookingReader: BookingReader, val bookingProcessor: Boo
     }
 
     fun reserveSeat(seatId: Int, bookingDate: String, uuid: Long): Booking {
-        return bookingReader.read(seatId = seatId, bookingDate = bookingDate)
-            .let { bookings -> bookingProcessor.reserve(bookings = bookings, uuid = uuid)
-            }
+        try {
+            return bookingProcessor.reserve(seatId = seatId, bookingDate = bookingDate, uuid = uuid)
+        } catch (e : Exception) {
+            throw FailedReserveException() // 흠 이것도 불편...
+        }
     }
 }
 

@@ -15,7 +15,7 @@ class ValidWaitTokenRepositoryImpl(private val redissonClient: RedissonClient,
         getSet().add(token)
     }
 
-    override fun pop(token: WaitToken) {
+    override fun remove(token: WaitToken) {
         getSet().remove(token)
     }
 

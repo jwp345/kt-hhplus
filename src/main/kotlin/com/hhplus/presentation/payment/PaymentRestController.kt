@@ -16,7 +16,7 @@ class PaymentRestController(val paymentFacade: PaymentFacade, val userValidator:
 
     @PostMapping("")
     fun payMoney(@RequestBody command : PaymentCommand) : ApiResponse<List<PaymentResponse>> {
-        userValidator.checkTokenAndUser(userUuid = command.uuid) // -> 어노테이션으로 빼는 거 고민
+        userValidator.checkTokenAndUser(userUuid = command.uuid)
         return paymentFacade.payMoney(concertInfos = command.concertInfos,
             waitToken = (SecurityContextHolder.getContext().authentication.principal as CustomUser).token)
             .let{ payments ->

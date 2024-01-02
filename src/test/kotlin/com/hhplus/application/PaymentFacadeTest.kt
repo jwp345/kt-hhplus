@@ -2,15 +2,15 @@ package com.hhplus.application
 
 import com.hhplus.domain.entity.Booking
 import com.hhplus.domain.entity.User
-import com.hhplus.domain.info.AssignmentInfo
-import com.hhplus.domain.info.ConcertInfo
 import com.hhplus.domain.repository.*
 import com.hhplus.infrastructure.security.WaitToken
 import com.hhplus.presentation.booking.BookingStatusCode
+import com.hhplus.presentation.payment.ConcertInfo
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.extension.ExtendWith
+import org.redisson.api.RedissonClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -29,13 +29,13 @@ class PaymentFacadeTest {
     lateinit var paymentFacade : PaymentFacade
 
     @Autowired
-    lateinit var ticketRepository: TicketRepository
-
-    @Autowired
     lateinit var userRepository : UserRepository
 
     @Autowired
     lateinit var validWaitTokenRepository: ValidWaitTokenRepository
+
+    @Autowired
+    lateinit var waitQueueRepository: WaitQueueRepository
 
     @Autowired
     lateinit var bookingRepository: BookingRepository
@@ -54,15 +54,15 @@ class PaymentFacadeTest {
 
     @BeforeAll
     fun init() {
+        // redis 초기화 어떻게 잘 할지 고민해보기
         concertInfo = ConcertInfo(seatId = seatId, date = bookingDate)
         user = User(name = "jaewon", balance = 10_000)
         userRepository.save(user)
 
         waitToken = WaitToken(uuid = user.uuid!!, order = 1, createAt = LocalDateTime.now())
-        ticketRepository.getLockAndReserveMap().map[concertInfo] =
-            AssignmentInfo(user.uuid!!, createdAt = LocalDateTime.now())
+        waitQueueRepository.add(token = WaitToken(uuid = 123, order = 2, createAt = LocalDateTime.now()))
         validWaitTokenRepository.add(token = waitToken)
-        bookingRepository.save(Booking(seatId = seatId, bookingDate = bookingDate, status = BookingStatusCode.AVAILABLE, price = 5000))
+        bookingRepository.save(Booking(seatId = seatId, bookingDate = bookingDate, status = BookingStatusCode.RESERVED, price = 5000))
     }
 
     @Order(2)
@@ -90,6 +90,13 @@ class PaymentFacadeTest {
     @Test
     fun `커밋된 후 비동기로 실행된 리스너가 동작하여야 한다`() {
         assertEquals(1, paymentRepository.findByUuid(user.uuid!!).size)
+    }
+
+    @Order(6)
+    @Test
+    fun `유효한 토큰들 중 하나가 만료되면 대기열 토큰에서 하나가 삭제되고 유효한 토큰 대기열에 추가된다`() {
+        assertEquals(validWaitTokenRepository.getSize(), 1)
+        assertEquals(waitQueueRepository.pop(), null)
     }
 
     @Order(1)

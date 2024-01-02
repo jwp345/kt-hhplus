@@ -1,21 +1,21 @@
 package com.hhplus.component
 
 import com.hhplus.domain.entity.Payment
-import com.hhplus.domain.entity.User
 import com.hhplus.domain.exception.FailedFindBookingException
 import com.hhplus.domain.exception.FailedPaymentException
-import com.hhplus.domain.exception.InvalidTicketException
 import com.hhplus.domain.exception.NotEnoughMoneyException
 import com.hhplus.domain.repository.BookingRepository
 import com.hhplus.domain.repository.ValidWaitTokenRepository
+import com.hhplus.domain.repository.WaitQueueRepository
 import com.hhplus.infrastructure.security.WaitToken
 import com.hhplus.presentation.booking.BookingStatusCode
+import com.hhplus.presentation.payment.ConcertInfo
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
 @Component
-class PaymentProcessor(val userReader: UserReader,
+class PaymentProcessor(val userReader: UserReader, val waitQueueRepository: WaitQueueRepository,
                        val validWaitTokenRepository: ValidWaitTokenRepository, val bookingRepository: BookingRepository,
     val applicationEventPublisher: ApplicationEventPublisher) {
 
@@ -25,12 +25,11 @@ class PaymentProcessor(val userReader: UserReader,
             val payments : MutableList<Payment> = mutableListOf()
             var totalPrice : Long = 0
             concertInfos.forEach { concertInfo ->
-                checkTicket(concertInfo = concertInfo, user = user)
                 try {
                     bookingRepository.findBySeatIdAndBookingDateAndStatus(
                         bookingDate = concertInfo.date,
                         seatId = concertInfo.seatId,
-                        availableCode = BookingStatusCode.AVAILABLE.code
+                        availableCode = BookingStatusCode.RESERVED.code
                     )[0].apply {
                         status = BookingStatusCode.CONFIRMED.code
                     }.also { booking ->
@@ -48,7 +47,8 @@ class PaymentProcessor(val userReader: UserReader,
             checkUserEnoughMoney(price = totalPrice, balance = user.balance)
             user.balance -= totalPrice
 
-            validWaitTokenRepository.pop(waitToken)
+            validWaitTokenRepository.remove(token = waitToken)
+            validWaitTokenRepository.add(token = waitQueueRepository.pop())
             applicationEventPublisher.publishEvent(PaymentEvent(payments = payments))
 
             return payments
@@ -58,13 +58,6 @@ class PaymentProcessor(val userReader: UserReader,
     fun checkUserEnoughMoney(price: Long, balance: Long) {
         if(price > balance) {
             throw NotEnoughMoneyException()
-        }
-    }
-
-    fun checkTicket(concertInfo: ConcertInfo, user : User) {
-        ticketRepository.getLockAndReserveMap().map.let { reserveMap ->
-            reserveMap[concertInfo]
-                ?: throw InvalidTicketException()
         }
     }
 }

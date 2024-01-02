@@ -13,8 +13,8 @@ class WaitQueueRepositoryImpl(val redissonClient: RedissonClient, val redisConfi
         redissonClient.getQueue<WaitToken>(redisConfig.waitQueueName).add(token)
     }
 
-    override fun pop(size : Int) : List<WaitToken> {
-        return redissonClient.getQueue<WaitToken>(redisConfig.waitQueueName).poll(size)
+    override fun pop() : WaitToken {
+        return redissonClient.getQueue<WaitToken>(redisConfig.waitQueueName).poll()
     }
 
 }

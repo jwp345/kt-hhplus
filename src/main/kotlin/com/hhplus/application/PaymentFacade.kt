@@ -2,9 +2,8 @@ package com.hhplus.application
 
 import com.hhplus.component.PaymentProcessor
 import com.hhplus.domain.entity.Payment
-import com.hhplus.domain.info.ConcertInfo
 import com.hhplus.infrastructure.security.WaitToken
-import com.hhplus.presentation.payment.PaymentCommand
+import com.hhplus.presentation.payment.ConcertInfo
 import org.springframework.stereotype.Service
 
 @Service

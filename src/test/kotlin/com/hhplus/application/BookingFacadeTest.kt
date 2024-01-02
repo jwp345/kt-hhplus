@@ -1,15 +1,13 @@
 package com.hhplus.application
 
+import com.hhplus.component.BookingReader
 import com.hhplus.presentation.booking.BookingStatusCode
 import com.hhplus.domain.entity.Booking
 import com.hhplus.domain.exception.*
-import com.hhplus.domain.info.ConcertInfo
-import com.hhplus.infrastructure.config.RedisConfig
-import com.hhplus.infrastructure.persistence.BookingRepositoryImpl
+import com.hhplus.domain.repository.BookingRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
-import org.redisson.api.RedissonClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import java.util.concurrent.CountDownLatch
@@ -25,20 +23,11 @@ internal class BookingFacadeTest {
     private lateinit var bookingFacade: BookingFacade
 
     @Autowired
-    private lateinit var bookingRepository: BookingRepositoryImpl
+    private lateinit var bookingRepository: BookingRepository
 
-    @Autowired
-    private lateinit var redissonClient: RedissonClient
-
-    @Autowired
-    private lateinit var redisConfig: RedisConfig
-
-    @Autowired
-    private lateinit var ticketRepository: TicketRepository
 
     @BeforeAll
     internal fun init() {
-        redissonClient.getMapCache<String, Long>(redisConfig.cacheReserveKey).clear()
         bookingRepository.save(
             Booking(seatId = 1, bookingDate = "2023-12-13 15:30", status = BookingStatusCode.AVAILABLE,
             price = 3000)
@@ -77,7 +66,7 @@ internal class BookingFacadeTest {
 
     @Test
     fun `예약 시 유효한 쿠폰의 정보 아닐 시 오류를 발생`() {
-        assertThrows(InvalidTicketException::class.java) {
+        assertThrows(FailedReserveException::class.java) {
             bookingFacade.reserveSeat(seatId = 1, bookingDate = "2023-12-13 19:30", uuid = 1L)
         }
     }
@@ -103,8 +92,8 @@ internal class BookingFacadeTest {
     @Order(2)
     fun `예약이 가능하면 예약을 성공한다`() {
         bookingFacade.reserveSeat(seatId = 1, bookingDate = "2023-12-13 15:30", uuid = 1)
-        assertThat(ticketRepository.getLockAndReserveMap()
-            .map.contains(ConcertInfo(seatId = 1, date = "2023-12-13 15:30")))
+        assertThat(bookingRepository.findBySeatIdAndBookingDateAndStatus(seatId = 1,
+            bookingDate = "2023-12-13 15:30", availableCode = BookingStatusCode.RESERVED.code).size).isEqualTo(1)
     }
 
     @Test
