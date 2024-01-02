@@ -3,7 +3,6 @@ package com.hhplus.component
 import com.hhplus.domain.entity.Booking
 import com.hhplus.domain.exception.FailedReserveException
 import com.hhplus.domain.exception.InvalidTicketException
-import com.hhplus.domain.repository.TicketRepository
 import com.hhplus.presentation.booking.BookingStatusCode
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test

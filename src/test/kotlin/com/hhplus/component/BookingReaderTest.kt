@@ -3,7 +3,6 @@ package com.hhplus.component
 import com.hhplus.domain.entity.Booking
 import com.hhplus.domain.info.ConcertInfo
 import com.hhplus.domain.repository.BookingRepository
-import com.hhplus.domain.repository.TicketRepository
 import com.hhplus.presentation.booking.BookingStatusCode
 import io.mockk.every
 import io.mockk.mockk

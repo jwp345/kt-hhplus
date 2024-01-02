@@ -4,7 +4,6 @@ import com.hhplus.presentation.booking.BookingStatusCode
 import com.hhplus.domain.entity.Booking
 import com.hhplus.domain.exception.*
 import com.hhplus.domain.info.ConcertInfo
-import com.hhplus.domain.repository.TicketRepository
 import com.hhplus.infrastructure.config.RedisConfig
 import com.hhplus.infrastructure.persistence.BookingRepositoryImpl
 import org.assertj.core.api.Assertions.assertThat

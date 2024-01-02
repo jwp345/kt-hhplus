@@ -8,7 +8,6 @@ import com.hhplus.domain.exception.NotEnoughMoneyException
 import com.hhplus.domain.info.AssignmentInfo
 import com.hhplus.domain.info.ConcertInfo
 import com.hhplus.domain.repository.BookingRepository
-import com.hhplus.domain.repository.TicketRepository
 import com.hhplus.domain.repository.ValidWaitTokenRepository
 import com.hhplus.infrastructure.security.WaitToken
 import com.hhplus.presentation.booking.BookingStatusCode

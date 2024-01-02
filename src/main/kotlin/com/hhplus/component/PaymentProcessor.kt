@@ -6,9 +6,7 @@ import com.hhplus.domain.exception.FailedFindBookingException
 import com.hhplus.domain.exception.FailedPaymentException
 import com.hhplus.domain.exception.InvalidTicketException
 import com.hhplus.domain.exception.NotEnoughMoneyException
-import com.hhplus.domain.info.ConcertInfo
 import com.hhplus.domain.repository.BookingRepository
-import com.hhplus.domain.repository.TicketRepository
 import com.hhplus.domain.repository.ValidWaitTokenRepository
 import com.hhplus.infrastructure.security.WaitToken
 import com.hhplus.presentation.booking.BookingStatusCode
@@ -17,7 +15,7 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
 @Component
-class PaymentProcessor(val ticketRepository: TicketRepository, val userReader: UserReader,
+class PaymentProcessor(val userReader: UserReader,
                        val validWaitTokenRepository: ValidWaitTokenRepository, val bookingRepository: BookingRepository,
     val applicationEventPublisher: ApplicationEventPublisher) {
 
