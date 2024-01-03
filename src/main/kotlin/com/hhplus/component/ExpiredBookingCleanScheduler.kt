@@ -15,7 +15,7 @@ class ExpiredBookingCleanScheduler(val bookingReader : BookingReader) {
     fun cleanExpiredBooking() {
         bookingReader.read(status = BookingStatusCode.RESERVED).forEach { booking ->
             booking.apply {
-                if (isExpired(modifiedAt, LocalDateTime.now())) {
+                if (isExpired(modifiedAt = modifiedAt, now = LocalDateTime.now())) {
                     status = BookingStatusCode.AVAILABLE.code
                 }
             }

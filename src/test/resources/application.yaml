@@ -22,4 +22,4 @@ waitToken:
 
 cron:
   expired:
-    clean: "* */1 * * * *"
+    clean: "0 0/1 * * * *"
