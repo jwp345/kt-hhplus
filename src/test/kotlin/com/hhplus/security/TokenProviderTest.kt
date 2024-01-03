@@ -1,5 +1,6 @@
 package com.hhplus.security
 import com.hhplus.application.TokenProvider
+import com.hhplus.domain.repository.WaitQueueRepository
 import com.hhplus.infrastructure.security.WaitToken
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
@@ -23,6 +24,9 @@ internal class TokenProviderTest {
     private lateinit var waitToken : WaitToken
 
     private val uuid : Long = 11L
+
+    @Autowired
+    private lateinit var waitQueueRepository: WaitQueueRepository
 
     @Order(1)
     @Test
@@ -74,5 +78,12 @@ internal class TokenProviderTest {
         val threadName = Thread.currentThread().name
         println("Processing request on thread: $threadName")
         tokens.add(tokenProvider.createToken(uuid = uuid))
+    }
+
+    @Test
+    fun `유효 토큰 갯수 초과 부터는 대기열에 토큰이 저장된다`() {
+        tokenProvider.createToken(23)
+        tokenProvider.createToken(11)
+        assertThat(waitQueueRepository.pop()).isNotNull
     }
 }

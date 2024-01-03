@@ -21,7 +21,7 @@ class BookingFacade (val bookingReader: BookingReader, val bookingProcessor: Boo
         try {
             return bookingProcessor.reserve(seatId = seatId, bookingDate = bookingDate, uuid = uuid)
         } catch (e : Exception) {
-            throw FailedReserveException() // 흠 이것도 불편...
+            throw FailedReserveException() // try catch문 위치 맞나?
         }
     }
 }

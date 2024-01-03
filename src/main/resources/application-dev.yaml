@@ -19,3 +19,7 @@ waitToken:
     max_size: 10000
   auth:
     name: auth-booking
+
+cron:
+  expired:
+    clean: "* */1 * * * *"

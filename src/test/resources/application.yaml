@@ -16,6 +16,10 @@ spring:
 
 waitToken:
   set:
-    max_size: 10000
+    max_size: 1
   auth:
     name: auth-booking
+
+cron:
+  expired:
+    clean: "* */1 * * * *"

@@ -30,6 +30,10 @@ class BookingReader(val bookingRepository: BookingRepository) {
             bookingDate = bookingDate, availableCode = BookingStatusCode.AVAILABLE.code)
     }
 
+    fun read(status : BookingStatusCode) : List<Booking> {
+        return bookingRepository.findByStatus(bookingStatusCode = status.code)
+    }
+
     private fun checkBookingDate(bookingDate: String): LocalDateTime {
         try {
             return LocalDateTime.parse(bookingDate, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
