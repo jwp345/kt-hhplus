@@ -44,14 +44,17 @@ dependencies {
     implementation ("org.mariadb.jdbc:mariadb-java-client:2.7.4")
     implementation("org.springframework.boot:spring-boot-devtools")
     implementation("org.redisson:redisson-spring-boot-starter:3.21.1")
-    testImplementation ("io.kotest:kotest-runner-junit5:5.5.5")
-    testImplementation ("io.kotest:kotest-assertions-core:5.5.5")
+    testImplementation("io.kotest:kotest-runner-junit5:5.5.5")
+    testImplementation("io.kotest:kotest-assertions-core:5.5.5")
     testImplementation("io.mockk:mockk:1.13.4")
-    implementation ("io.hypersistence:hypersistence-utils-hibernate-60:3.5.1")
+    implementation("io.hypersistence:hypersistence-utils-hibernate-60:3.5.1")
     testImplementation("org.testcontainers:testcontainers")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:mariadb")
     implementation("io.github.microutils:kotlin-logging:1.12.0")
+    implementation(group = "ca.pjer", name = "logback-awslogs-appender", version = "1.6.0")
+    // 프로퍼티 제어 in xml
+    implementation("org.codehaus.janino:janino:3.1.7")
 }
 
 tasks.withType<KotlinCompile> {
