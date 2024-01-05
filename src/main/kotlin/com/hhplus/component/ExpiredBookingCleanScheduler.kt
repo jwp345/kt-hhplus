@@ -1,5 +1,6 @@
 package com.hhplus.component
 
+import com.hhplus.logger
 import com.hhplus.presentation.booking.BookingStatusCode
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
@@ -10,15 +11,20 @@ import java.time.LocalDateTime
 @Component
 class ExpiredBookingCleanScheduler(val bookingReader : BookingReader) {
 
+    val log = logger()
     @Scheduled(cron = "\${cron.expired.clean}")
     @Transactional
     fun cleanExpiredBooking() {
-        bookingReader.read(status = BookingStatusCode.RESERVED).forEach { booking ->
-            booking.apply {
-                if (isExpired(modifiedAt = modifiedAt, now = LocalDateTime.now())) {
-                    status = BookingStatusCode.AVAILABLE.code
+        try {
+            bookingReader.read(status = BookingStatusCode.RESERVED).forEach { booking ->
+                booking.apply {
+                    if (isExpired(modifiedAt = modifiedAt, now = LocalDateTime.now())) {
+                        status = BookingStatusCode.AVAILABLE.code
+                    }
                 }
             }
+        } catch (e : Exception) {
+            log.error(e.printStackTrace().toString())
         }
     }
 
