@@ -57,7 +57,8 @@ jobs:
       run: chmod +x gradlew
 
     - name: Build with Gradle and Check ktLint
-      run: ./gradlew build -x test -x ktlintCheck
+      run: ./gradlew build -x test
+#        -x ktlintCheck
 
     # docker build & push to production
     - name: Docker build & push to prod
