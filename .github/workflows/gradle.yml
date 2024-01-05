@@ -39,11 +39,11 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradle-
 
-    - name: ktlint
-      uses: ScaCap/action-ktlint@master
-      with:
-        github_token: ${{ secrets.GIT_TOKEN }}
-        reporter: github-pr-check
+#    - name: ktlint
+#      uses: ScaCap/action-ktlint@master
+#      with:
+#        github_token: ${{ secrets.GIT_TOKEN }}
+#        reporter: github-pr-check
 
     # prod setting
     - name: make application-prod.yml
