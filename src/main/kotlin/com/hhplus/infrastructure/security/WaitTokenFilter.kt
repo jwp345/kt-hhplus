@@ -4,6 +4,7 @@ import com.hhplus.application.TokenProvider
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import mu.KotlinLogging
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.filter.OncePerRequestFilter
 import java.io.ByteArrayInputStream
@@ -13,6 +14,8 @@ import java.util.*
 
 class WaitTokenFilter(private val tokenProvider: TokenProvider)
     : OncePerRequestFilter() {
+
+    private val log = KotlinLogging.logger("BookingProcessor")
 
     override fun doFilterInternal(
         request: HttpServletRequest,
@@ -24,6 +27,8 @@ class WaitTokenFilter(private val tokenProvider: TokenProvider)
         if (token != null && tokenProvider.validateToken(token)) {
             val authentication = tokenProvider.getAuthentication(token)
             SecurityContextHolder.getContext().authentication = authentication
+        } else {
+            log.warn("Token authentication error Token : {}", token)
         }
         filterChain.doFilter(request, response)
     }
@@ -31,11 +36,19 @@ class WaitTokenFilter(private val tokenProvider: TokenProvider)
     private fun decodeToken(request: HttpServletRequest): WaitToken? {
         request.getHeader("X-WAIT-TOKEN")
             .let { token ->
-                if(token == null) return null
+                if(token == null) {
+                    log.warn("Cannot Find Token In Header")
+                    return null
+                }
                 val inputStream = ByteArrayInputStream(Base64.getDecoder().decode(token))
 
-                ObjectInputStream(inputStream).use {
-                    return it.readObject() as? WaitToken
+                try {
+                    ObjectInputStream(inputStream).use {
+                        return it.readObject() as? WaitToken
+                    }
+                } catch (e : Exception) {
+                    log.warn("Fail to Token Decode : {}", token)
+                    return null
                 }
             }
     }

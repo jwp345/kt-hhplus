@@ -1,7 +1,8 @@
 package com.hhplus.component
 
-import com.hhplus.logger
+
 import com.hhplus.presentation.booking.BookingStatusCode
+import mu.KotlinLogging.logger
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -11,7 +12,7 @@ import java.time.LocalDateTime
 @Component
 class ExpiredBookingCleanScheduler(val bookingReader : BookingReader) {
 
-    val log = logger()
+    private val log = logger("ExpiredBookingCleanSchedule")
     @Scheduled(cron = "\${cron.expired.clean}")
     @Transactional
     fun cleanExpiredBooking() {
@@ -24,7 +25,7 @@ class ExpiredBookingCleanScheduler(val bookingReader : BookingReader) {
                 }
             }
         } catch (e : Exception) {
-            log.error(e.printStackTrace().toString())
+            log.error(e.cause.toString())
         }
     }
 

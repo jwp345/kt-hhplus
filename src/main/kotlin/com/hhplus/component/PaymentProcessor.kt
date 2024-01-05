@@ -10,6 +10,7 @@ import com.hhplus.domain.repository.WaitQueueRepository
 import com.hhplus.infrastructure.security.WaitToken
 import com.hhplus.presentation.booking.BookingStatusCode
 import com.hhplus.presentation.payment.ConcertInfo
+import mu.KotlinLogging
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -19,6 +20,7 @@ class PaymentProcessor(val userReader: UserReader, val waitQueueRepository: Wait
                        val validWaitTokenRepository: ValidWaitTokenRepository, val bookingRepository: BookingRepository,
     val applicationEventPublisher: ApplicationEventPublisher) {
 
+    private val log = KotlinLogging.logger("PaymentProcessor")
     @Transactional
     fun pay(concertInfos: List<ConcertInfo>, waitToken : WaitToken) : List<Payment> {
         userReader.read(uuid = waitToken.uuid).let { user ->
@@ -38,8 +40,10 @@ class PaymentProcessor(val userReader: UserReader, val waitQueueRepository: Wait
                         totalPrice += booking.price
                     }
                 } catch (e : IndexOutOfBoundsException) {
+                    log.warn("Invalid ConcertInfo found : ConcertInfo: {}, waitToken : {}", concertInfo, waitToken)
                     throw FailedFindBookingException()
                 } catch (e : Exception) {
+                    log.error(e.cause.toString())
                     throw FailedPaymentException()
                 }
             }

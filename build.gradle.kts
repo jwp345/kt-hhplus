@@ -51,14 +51,7 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:mariadb")
-    implementation("org.apache.logging.log4j:log4j-api-kotlin:1.2.0")
-    implementation("org.springframework.boot:spring-boot-starter-log4j2")
-    implementation("com.lmax:disruptor:3.4.2") // asyncLogger를 위해 필요
-    modules {
-        module("org.springframework.boot:spring-boot-starter-logging") {
-            replacedBy("org.springframework.boot:spring-boot-starter-log4j2", "Use Log4j2 instead of Logback")
-        }
-    }
+    implementation("io.github.microutils:kotlin-logging:1.12.0")
 }
 
 tasks.withType<KotlinCompile> {
