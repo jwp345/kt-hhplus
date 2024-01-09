@@ -34,7 +34,7 @@
         <retentionTimeDays>0</retentionTimeDays>
     </appender>
 
-    <springProfile name="dev">
+    <springProfile name="prod">
         <logger name="org.springframework" level="INFO" />
         <logger name="inc.bfactory.kpop" level="INFO"/>
         <root level="INFO">
