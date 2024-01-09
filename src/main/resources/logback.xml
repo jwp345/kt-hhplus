@@ -25,6 +25,7 @@
                 <logGroupName>${Log_Group_Name:prod}</logGroupName>
             </then>
         </if>
+        <logGroupName>hhplus-kt-prod-error</logGroupName>
         <logStreamUuidPrefix>error-</logStreamUuidPrefix>
         <logStreamName>error</logStreamName>
         <logRegion>ap-northeast-2</logRegion>
