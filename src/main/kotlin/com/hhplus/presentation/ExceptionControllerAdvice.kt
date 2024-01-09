@@ -17,6 +17,6 @@ class ExceptionControllerAdvice() {
     @ExceptionHandler
     fun <T> handleGlobalException(ex : Exception): ApiResponse<T?> {
         log.error { ex.stackTrace }
-        return ApiResponse.error(code = 500, message = "알 수 없는 에러가 발생 하였습니다.")
+        return ApiResponse.globalError()
     }
 }

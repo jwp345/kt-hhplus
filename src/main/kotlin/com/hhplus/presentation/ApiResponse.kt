@@ -25,5 +25,9 @@ data class ApiResponse<T>(
         fun <T> error(code: Int, message: String?): ApiResponse<T?> {
             return of(code, message, null)
         }
+
+        fun<T> globalError() : ApiResponse<T?> {
+            return of(HttpStatus.INTERNAL_SERVER_ERROR.value(), null, null)
+        }
     }
 }
