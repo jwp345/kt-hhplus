@@ -26,6 +26,7 @@
             </then>
         </if>
         <logStreamUuidPrefix>error-</logStreamUuidPrefix>
+        <logStreamName>error</logStreamName>
         <logRegion>ap-northeast-2</logRegion>
         <maxBatchLogEvents>50</maxBatchLogEvents>
         <maxFlushTimeMillis>30000</maxFlushTimeMillis>
