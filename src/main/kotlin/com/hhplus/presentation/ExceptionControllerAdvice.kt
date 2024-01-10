@@ -2,6 +2,8 @@ package com.hhplus.presentation
 
 import com.hhplus.domain.exception.InvalidException
 import mu.KotlinLogging
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 
@@ -15,8 +17,8 @@ class ExceptionControllerAdvice() {
     }
 
     @ExceptionHandler
-    fun <T> handleGlobalException(ex : Exception): ApiResponse<T?> {
+    fun <T> handleGlobalException(ex : Exception): ResponseEntity<T> {
         log.error { ex.stackTrace }
-        return ApiResponse.error(code = 500, message = "알 수 없는 에러가 발생 하였습니다.")
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
     }
 }
