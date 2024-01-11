@@ -34,14 +34,17 @@ class TokenProvider(val waitQueueRepository: WaitQueueRepository, val validWaitT
     /* TODO: 중복 토큰 생성 방지 및 처리율 제한 위해(따닥 방지위해) RateLimiter? */
     fun createToken(uuid: Long): String {
         try {
+            val createAt = LocalDateTime.now()
             WaitToken(
-                uuid = uuid, order = this.order.incrementAndGet(), createAt = LocalDateTime.now()
+                uuid = uuid, order = this.order.incrementAndGet(), createAt = createAt
             ).let { token ->
-
                 if (validWaitTokenRepository.getSize() <= validTokenMaxsize.toInt()) {
                     validWaitTokenRepository.add(token)
+                    log.info("Valid Wait Token Created : uuid : {}, order: {}, createAt : {}",
+                        uuid, order, createAt)
                 } else {
                     waitQueueRepository.add(token)
+                    log.info("Store In WaitQueue : uuid : {}, order: {}, createAt : {}", uuid, order, createAt)
                 }
 
                 return ByteArrayOutputStream().use { byteArrayOutputStream ->
