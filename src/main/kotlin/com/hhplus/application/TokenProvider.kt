@@ -41,10 +41,10 @@ class TokenProvider(val waitQueueRepository: WaitQueueRepository, val validWaitT
                 if (validWaitTokenRepository.getSize() <= validTokenMaxsize.toInt()) {
                     validWaitTokenRepository.add(token)
                     log.info("Valid Wait Token Created : uuid : {}, order: {}, createAt : {}",
-                        uuid, order, createAt)
+                        uuid, order.get(), createAt)
                 } else {
                     waitQueueRepository.add(token)
-                    log.info("Store In WaitQueue : uuid : {}, order: {}, createAt : {}", uuid, order, createAt)
+                    log.info("Store In WaitQueue : uuid : {}, order: {}, createAt : {}", uuid, order.get(), createAt)
                 }
 
                 return ByteArrayOutputStream().use { byteArrayOutputStream ->

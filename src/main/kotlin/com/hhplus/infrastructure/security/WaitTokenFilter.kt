@@ -53,4 +53,13 @@ class WaitTokenFilter(private val tokenProvider: TokenProvider)
             }
     }
 
+    override fun shouldNotFilter(request: HttpServletRequest): Boolean {
+        val excludePath = arrayOf("/api/v1/token")
+        val path = request.requestURI
+        return Arrays.stream(excludePath).anyMatch { prefix: String? ->
+            path.startsWith(
+                prefix!!
+            )
+        }
+    }
 }
