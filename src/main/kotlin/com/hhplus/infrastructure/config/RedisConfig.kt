@@ -1,7 +1,9 @@
 package com.hhplus.infrastructure.config
 
+import com.hhplus.infrastructure.security.WaitToken
 import org.redisson.Redisson
 import org.redisson.api.RedissonClient
+import org.redisson.codec.TypedJsonJacksonCodec
 import org.redisson.config.Config
 import org.redisson.spring.data.connection.RedissonConnectionFactory
 import org.springframework.boot.context.properties.ConfigurationProperties
@@ -27,6 +29,7 @@ class RedisConfig {
         config.useSingleServer()
             .setAddress("redis://$host:$port")
             .setDnsMonitoringInterval(-1)
+        config.codec = TypedJsonJacksonCodec(WaitToken::class.java)
         return Redisson.create(config)
     }
 
