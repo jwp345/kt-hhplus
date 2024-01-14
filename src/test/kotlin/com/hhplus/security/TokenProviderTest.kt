@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import java.io.ByteArrayInputStream
 import java.io.ObjectInputStream
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.*
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
@@ -44,7 +45,8 @@ internal class TokenProviderTest {
 
     @Test
     fun `토큰이 유효한 토큰 저장소에 존재 하지 않으면 false를 리턴 한다`() {
-        assertThat(tokenProvider.validateToken(WaitToken(uuid = 1L, order = 2L, createAt = LocalDateTime.now())))
+        assertThat(tokenProvider.validateToken(WaitToken(uuid = 1L, order = 2L, createAt = LocalDateTime.now().toEpochSecond(
+            ZoneOffset.UTC))))
             .isFalse()
     }
 

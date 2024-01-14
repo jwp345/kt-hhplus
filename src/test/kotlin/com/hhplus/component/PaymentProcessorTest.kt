@@ -16,6 +16,7 @@ import io.mockk.every
 import io.mockk.mockk
 import org.springframework.context.ApplicationEventPublisher
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 internal class PaymentProcessorTest : AnnotationSpec(){
     private val userReader : UserReader = mockk<UserReader>()
@@ -47,7 +48,8 @@ internal class PaymentProcessorTest : AnnotationSpec(){
             seatId = concertInfo.seatId, availableCode = BookingStatusCode.RESERVED.code) }.returns(listOf())
 
         shouldThrow<FailedFindBookingException> {
-            paymentProcessor.pay(concertInfos = listOf(concertInfo), waitToken = WaitToken(uuid = 1, order = 1, createAt = LocalDateTime.now()))
+            paymentProcessor.pay(concertInfos = listOf(concertInfo), waitToken = WaitToken(uuid = 1, order = 1, createAt = LocalDateTime.now().toEpochSecond(
+                ZoneOffset.UTC)))
         }
     }
 
@@ -60,7 +62,7 @@ internal class PaymentProcessorTest : AnnotationSpec(){
             seatId = concertInfo.seatId, availableCode = BookingStatusCode.AVAILABLE.code) }.throws(RuntimeException())
 
         shouldThrow<FailedPaymentException> {
-            paymentProcessor.pay(concertInfos = listOf(concertInfo), waitToken = WaitToken(uuid = 1, order = 1, createAt = LocalDateTime.now()))
+            paymentProcessor.pay(concertInfos = listOf(concertInfo), waitToken = WaitToken(uuid = 1, order = 1, createAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)))
         }
     }
 }

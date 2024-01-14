@@ -1,6 +1,8 @@
 package com.hhplus.component
 
+import com.hhplus.domain.entity.Booking
 import com.hhplus.domain.entity.Payment
+import com.hhplus.domain.entity.User
 import com.hhplus.domain.exception.FailedFindBookingException
 import com.hhplus.domain.exception.FailedPaymentException
 import com.hhplus.domain.exception.NotEnoughMoneyException
@@ -12,6 +14,7 @@ import com.hhplus.presentation.booking.BookingStatusCode
 import com.hhplus.presentation.payment.ConcertInfo
 import mu.KotlinLogging
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
@@ -28,35 +31,39 @@ class PaymentProcessor(val userReader: UserReader, val waitQueueRepository: Wait
             var totalPrice : Long = 0
             concertInfos.forEach { concertInfo ->
                 try {
-                    bookingRepository.findBySeatIdAndBookingDateAndStatus(
-                        bookingDate = concertInfo.date,
-                        seatId = concertInfo.seatId,
-                        availableCode = BookingStatusCode.RESERVED.code
-                    )[0].apply {
+                    findBooking(concertInfo = concertInfo).apply {
                         status = BookingStatusCode.CONFIRMED.code
                     }.also { booking ->
                         payments.add(Payment(uuid = waitToken.uuid, seatId = concertInfo.seatId, bookingDate = concertInfo.date,
                             price = booking.price))
                         totalPrice += booking.price
                     }
-                } catch (e : IndexOutOfBoundsException) {
-                    log.warn("Invalid ConcertInfo found : ConcertInfo: {}, waitToken : {}", concertInfo, waitToken)
+                } catch (e : OptimisticLockingFailureException) {
                     throw FailedFindBookingException()
-                } catch (e : Exception) {
-                    log.error(e.cause.toString())
-                    throw FailedPaymentException()
                 }
+            }.also {
+                payTotals(user = user, totalPrice = totalPrice, waitToken = waitToken, payments = payments)
             }
-
-            checkUserEnoughMoney(price = totalPrice, balance = user.balance)
-            user.balance -= totalPrice
-
-            validWaitTokenRepository.remove(token = waitToken)
-            validWaitTokenRepository.add(token = waitQueueRepository.pop())
-            applicationEventPublisher.publishEvent(PaymentEvent(payments = payments))
 
             return payments
         }
+    }
+
+    private fun findBooking(concertInfo: ConcertInfo) : Booking {
+        return bookingRepository.findBySeatIdAndBookingDateAndStatus(
+            bookingDate = concertInfo.date,
+            seatId = concertInfo.seatId,
+            availableCode = BookingStatusCode.RESERVED.code
+        ).firstOrNull() ?: throw FailedFindBookingException()
+    }
+
+    private fun payTotals(user : User, totalPrice : Long, waitToken: WaitToken, payments : MutableList<Payment>) {
+        checkUserEnoughMoney(price = totalPrice, balance = user.balance)
+        user.balance -= totalPrice
+
+        validWaitTokenRepository.remove(token = waitToken)
+        validWaitTokenRepository.add(token = waitQueueRepository.pop())
+        applicationEventPublisher.publishEvent(PaymentEvent(payments = payments))
     }
 
     fun checkUserEnoughMoney(price: Long, balance: Long) {

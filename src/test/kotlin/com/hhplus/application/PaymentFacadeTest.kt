@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
@@ -59,8 +60,8 @@ class PaymentFacadeTest {
         user = User(name = "jaewon", balance = 10_000)
         userRepository.save(user)
 
-        waitToken = WaitToken(uuid = user.uuid!!, order = 1, createAt = LocalDateTime.now())
-        waitQueueRepository.add(token = WaitToken(uuid = 123, order = 2, createAt = LocalDateTime.now()))
+        waitToken = WaitToken(uuid = user.uuid!!, order = 1, createAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))
+        waitQueueRepository.add(token = WaitToken(uuid = 123, order = 2, createAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)))
         validWaitTokenRepository.add(token = waitToken)
         bookingRepository.save(Booking(seatId = seatId, bookingDate = bookingDate, status = BookingStatusCode.RESERVED, price = 5000))
     }
