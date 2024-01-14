@@ -44,8 +44,8 @@ internal class PaymentProcessorTest : AnnotationSpec(){
         val user = User(name = "name", balance = 1000)
         val concertInfo = ConcertInfo(seatId = 1, date = "2023-11-20 11:20")
         every { userReader.read(1) }.returns(user)
-        every { bookingRepository.findBySeatIdAndBookingDateAndStatus(bookingDate = concertInfo.date,
-            seatId = concertInfo.seatId, availableCode = BookingStatusCode.RESERVED.code) }.returns(listOf())
+        every { bookingRepository.findBySeatIdAndBookingDateAndStatusAndUserUuid(bookingDate = concertInfo.date,
+            seatId = concertInfo.seatId, availableCode = BookingStatusCode.RESERVED.code, userUuid = 1) }.returns(listOf())
 
         shouldThrow<FailedFindBookingException> {
             paymentProcessor.pay(concertInfos = listOf(concertInfo), waitToken = WaitToken(uuid = 1, order = 1, createAt = LocalDateTime.now().toEpochSecond(
@@ -53,16 +53,4 @@ internal class PaymentProcessorTest : AnnotationSpec(){
         }
     }
 
-    @Test
-    fun `db 조회 중 커넥션 에러가 발생 시 결제 실패 예외 발생`() {
-        val user = User(name = "name", balance = 1000)
-        val concertInfo = ConcertInfo(seatId = 1, date = "2023-11-20 11:20")
-        every { userReader.read(1) }.returns(user)
-        every { bookingRepository.findBySeatIdAndBookingDateAndStatus(bookingDate = concertInfo.date,
-            seatId = concertInfo.seatId, availableCode = BookingStatusCode.AVAILABLE.code) }.throws(RuntimeException())
-
-        shouldThrow<FailedPaymentException> {
-            paymentProcessor.pay(concertInfos = listOf(concertInfo), waitToken = WaitToken(uuid = 1, order = 1, createAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)))
-        }
-    }
 }

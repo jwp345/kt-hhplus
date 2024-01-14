@@ -31,6 +31,9 @@ final class Booking(seatId : Int, bookingDate : String, status : BookingStatusCo
     @Column(name = "price", nullable = false) // 단위 : 원
     var price : Long = price
 
+    @Column(name = "user_uuid", nullable = true)
+    var userUuid : Long ?= null
+
     @Version
     private val version : Int ?= null
 }

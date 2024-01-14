@@ -4,7 +4,6 @@ import com.hhplus.domain.entity.Booking
 import com.hhplus.domain.entity.Payment
 import com.hhplus.domain.entity.User
 import com.hhplus.domain.exception.FailedFindBookingException
-import com.hhplus.domain.exception.FailedPaymentException
 import com.hhplus.domain.exception.NotEnoughMoneyException
 import com.hhplus.domain.repository.BookingRepository
 import com.hhplus.domain.repository.ValidWaitTokenRepository
@@ -12,7 +11,6 @@ import com.hhplus.domain.repository.WaitQueueRepository
 import com.hhplus.infrastructure.security.WaitToken
 import com.hhplus.presentation.booking.BookingStatusCode
 import com.hhplus.presentation.payment.ConcertInfo
-import mu.KotlinLogging
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.stereotype.Component
@@ -23,7 +21,6 @@ class PaymentProcessor(val userReader: UserReader, val waitQueueRepository: Wait
                        val validWaitTokenRepository: ValidWaitTokenRepository, val bookingRepository: BookingRepository,
     val applicationEventPublisher: ApplicationEventPublisher) {
 
-    private val log = KotlinLogging.logger("PaymentProcessor")
     @Transactional
     fun pay(concertInfos: List<ConcertInfo>, waitToken : WaitToken) : List<Payment> {
         userReader.read(uuid = waitToken.uuid).let { user ->
@@ -31,7 +28,7 @@ class PaymentProcessor(val userReader: UserReader, val waitQueueRepository: Wait
             var totalPrice : Long = 0
             concertInfos.forEach { concertInfo ->
                 try {
-                    findBooking(concertInfo = concertInfo).apply {
+                    findBooking(concertInfo = concertInfo, uuid = waitToken.uuid).apply {
                         status = BookingStatusCode.CONFIRMED.code
                     }.also { booking ->
                         payments.add(Payment(uuid = waitToken.uuid, seatId = concertInfo.seatId, bookingDate = concertInfo.date,
@@ -49,11 +46,12 @@ class PaymentProcessor(val userReader: UserReader, val waitQueueRepository: Wait
         }
     }
 
-    private fun findBooking(concertInfo: ConcertInfo) : Booking {
-        return bookingRepository.findBySeatIdAndBookingDateAndStatus(
+    private fun findBooking(concertInfo: ConcertInfo, uuid : Long) : Booking {
+        return bookingRepository.findBySeatIdAndBookingDateAndStatusAndUserUuid(
             bookingDate = concertInfo.date,
             seatId = concertInfo.seatId,
-            availableCode = BookingStatusCode.RESERVED.code
+            availableCode = BookingStatusCode.RESERVED.code,
+            userUuid = uuid
         ).firstOrNull() ?: throw FailedFindBookingException()
     }
 

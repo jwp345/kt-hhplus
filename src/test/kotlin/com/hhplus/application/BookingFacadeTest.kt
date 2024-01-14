@@ -92,8 +92,8 @@ internal class BookingFacadeTest {
     @Order(2)
     fun `예약이 가능하면 예약을 성공한다`() {
         bookingFacade.reserveSeat(seatId = 1, bookingDate = "2023-12-13 15:30", uuid = 1)
-        assertThat(bookingRepository.findBySeatIdAndBookingDateAndStatus(seatId = 1,
-            bookingDate = "2023-12-13 15:30", availableCode = BookingStatusCode.RESERVED.code).size).isEqualTo(1)
+        assertThat(bookingRepository.findBySeatIdAndBookingDateAndStatusAndUserUuid(seatId = 1,
+            bookingDate = "2023-12-13 15:30", availableCode = BookingStatusCode.RESERVED.code, userUuid = 1).size).isEqualTo(1)
     }
 
     @Test

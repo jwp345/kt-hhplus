@@ -22,6 +22,7 @@ class BookingProcessor(val bookingReader: BookingReader) {
                 val booking : Booking = bookings[0]
 
                 booking.status = BookingStatusCode.RESERVED.code
+                booking.userUuid = uuid
                 return booking
             }
         } catch (e : IllegalArgumentException) {

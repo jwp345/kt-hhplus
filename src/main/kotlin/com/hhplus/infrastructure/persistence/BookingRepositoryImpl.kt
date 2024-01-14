@@ -16,6 +16,13 @@ interface BookingRepositoryImpl : JpaRepository<Booking, Long>, BookingRepositor
         availableCode: Int
     ): List<Booking>
 
+    override fun findBySeatIdAndBookingDateAndStatusAndUserUuid(
+        seatId: Int,
+        bookingDate: String,
+        availableCode: Int,
+        userUuid: Long
+    ): List<Booking>
+
     override fun save(booking: Booking) {
         this.save(booking)
     }

@@ -9,6 +9,8 @@ interface BookingRepository {
 
     fun findBySeatIdAndBookingDateAndStatus(seatId: Int, bookingDate: String, availableCode: Int) : List<Booking>
 
+    fun findBySeatIdAndBookingDateAndStatusAndUserUuid(seatId: Int, bookingDate: String, availableCode: Int, userUuid : Long) : List<Booking>
+
     fun save(booking : Booking)
 
     fun findByStatus(bookingStatusCode : Int) : List<Booking>
