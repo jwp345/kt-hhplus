@@ -22,6 +22,7 @@ class RedisConfig {
     final val cacheReserveKey : String = "seat-reservation"
     final val waitQueueName : String = "wait-queue"
     final val validSetName : String = "wait-set"
+    final val orderCounterName : String = "order-counter"
 
     @Bean(destroyMethod = "shutdown")
     fun redissonClient(): RedissonClient {

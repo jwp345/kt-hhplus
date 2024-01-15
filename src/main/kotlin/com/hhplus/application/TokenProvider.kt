@@ -2,6 +2,7 @@ package com.hhplus.application
 
 import com.hhplus.domain.exception.FailedCreateTokenException
 import com.hhplus.domain.exception.InvalidAuthenticationException
+import com.hhplus.domain.repository.OrderCounterRepository
 import com.hhplus.domain.repository.ValidWaitTokenRepository
 import com.hhplus.domain.repository.WaitQueueRepository
 import com.hhplus.infrastructure.security.CustomUser
@@ -19,16 +20,16 @@ import java.io.ObjectOutputStream
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
-import java.util.concurrent.atomic.AtomicLong
 
 @Service
-class TokenProvider(val waitQueueRepository: WaitQueueRepository, val validWaitTokenRepository: ValidWaitTokenRepository) {
+class TokenProvider(val waitQueueRepository: WaitQueueRepository, val validWaitTokenRepository: ValidWaitTokenRepository,
+    val orderCounterRepository: OrderCounterRepository) {
 
     @Value("\${waitToken.set.max_size}")
     private lateinit var validTokenMaxsize : String
     @Value("\${waitToken.auth.name}")
     private lateinit var waitTokenAuth : String
-    private var order : AtomicLong = AtomicLong(0L)
+
 
     private val log = KotlinLogging.logger("TokenProvider")
 
@@ -37,7 +38,7 @@ class TokenProvider(val waitQueueRepository: WaitQueueRepository, val validWaitT
         try {
             val createAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
             WaitToken(
-                uuid = uuid, order = this.order.incrementAndGet(), createAt = createAt
+                uuid = uuid, order = orderCounterRepository.incrementAndGet(), createAt = createAt
             ).let { token ->
                 if (validWaitTokenRepository.getSize() <= validTokenMaxsize.toInt()) {
                     validWaitTokenRepository.add(token)
