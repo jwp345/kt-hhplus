@@ -60,7 +60,7 @@ class PaymentProcessor(val userReader: UserReader, val waitQueueRepository: Wait
         user.balance -= totalPrice
 
         validWaitTokenRepository.remove(token = waitToken)
-        validWaitTokenRepository.add(token = waitQueueRepository.pop())
+        waitQueueRepository.pop()?.let { validWaitTokenRepository.add(token = it) }
         applicationEventPublisher.publishEvent(PaymentEvent(payments = payments))
     }
 

@@ -42,7 +42,8 @@
       + 예약 정보는 ttl 걸지 말고 예약이 된 시간을 저장해놓은 후, 미결제했는데 시간 지났다면 배치프로세스를 돌면서 hashSet에서 코인 일괄 삭제
   + 결제를 구현할 때 결제 이력이 실패하면 결제 자체를 취소시키는 게 올바른 방향이 아닌 것 같은데 좋은 방법은?
     + 트랜잭션 분리와 결제 이력이 실패 해도 결제를 위한 트랜잭션에는 영향을 미치지 않도록 비동기 TransactionalEventListener를 사용하여 구현
-
+  + redisson 라이브러리를 사용할 경우 종속적인 클래스 정보가 포함된 걸 어떻게 종속적이지 않게 바꿀 수 있을지 고민
+    + https://zorba91.tistory.com/352 참고하여 codec 설정 변경
 
 + 알게 된 점
   + given(ticketRepository.getLockAndReserveMap().mapCache.contains(any(ConcertInfo::class.java)))
