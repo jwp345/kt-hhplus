@@ -3,6 +3,7 @@
 + 할 일들 List up
   + 밸리데이션 어노테이션으로 빼기
   + 일관성을 위해 booking date db 컬럼 LocalDateTime로 변경 하기
+  + 로그 형식 {traceId: ...} 같이 형식 변경해서 사용하기
   + 테스트 코드 redis 초기화 방안 고민하기
   + 추후 도커 이미지 등을 위해 테스트 컨네이너 등을 사용하여 로컬이 아닌 테스트를 위한 환경 구성하기
   + 예약 이력도 추후 적재 할 지 고민
@@ -53,5 +54,5 @@
   + publishEvent()메소드를 사용하여 이벤트를 전송할 때 data class 말고 List<>() 같이 단순 래핑해서 보낼 시 제대로 메시지 리스너가 동작하지 않는다.
 
 
-참조: https://www.baeldung.com/java-generating-time-based-uuids,
-https://ssdragon.tistory.com/162
+참조: https://www.baeldung.com/java-generating-time-based-uuids
+<br>https://ssdragon.tistory.com/162
