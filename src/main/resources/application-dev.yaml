@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://localhost:3306/test
+    url: jdbc:mariadb://localhost:3307/test
     username: root
     password: root
   data:
@@ -13,6 +13,10 @@ spring:
     hibernate:
       ddl-auto: create
     defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+      platform: mariadb
 
 waitToken:
   set:

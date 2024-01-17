@@ -55,6 +55,7 @@ dependencies {
     implementation(group = "ca.pjer", name = "logback-awslogs-appender", version = "1.6.0")
     // 프로퍼티 제어 in xml
     implementation("org.codehaus.janino:janino:3.1.7")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
 }
 
 tasks.withType<KotlinCompile> {
