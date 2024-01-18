@@ -9,8 +9,6 @@ import com.hhplus.infrastructure.security.CustomUser
 import com.hhplus.infrastructure.security.WaitToken
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.cache.annotation.CacheConfig
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
@@ -24,7 +22,6 @@ import java.time.ZoneOffset
 import java.util.*
 
 @Service
-@CacheConfig(cacheNames = ["tokens"])
 class TokenProvider(val waitQueueRepository: WaitQueueRepository, val validWaitTokenRepository: ValidWaitTokenRepository,
     val orderCounterRepository: OrderCounterRepository) {
 
@@ -36,8 +33,6 @@ class TokenProvider(val waitQueueRepository: WaitQueueRepository, val validWaitT
 
     private val log = KotlinLogging.logger("TokenProvider")
 
-    /* TODO: 중복 토큰 생성 방지 및 처리율 제한 위해(따닥 방지위해) RateLimiter? */
-    @Cacheable(key = "#uuid")
     fun createToken(uuid: Long): String {
         try {
             val createAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
@@ -50,7 +45,6 @@ class TokenProvider(val waitQueueRepository: WaitQueueRepository, val validWaitT
                     waitQueueRepository.add(token)
                 }
 
-                log.info { "토큰 생성" }
                 return ByteArrayOutputStream().use { byteArrayOutputStream ->
                     ObjectOutputStream(byteArrayOutputStream).use {
                         it.writeObject(token)
@@ -71,7 +65,6 @@ class TokenProvider(val waitQueueRepository: WaitQueueRepository, val validWaitT
             .split(",")
             .map { SimpleGrantedAuthority(it) }
         val principal: UserDetails = CustomUser(token = token, userName = token.uuid.toString(), password = "", authorities = authorities)
-
 
             return UsernamePasswordAuthenticationToken(principal, "", authorities)
         } catch (e : Exception) {

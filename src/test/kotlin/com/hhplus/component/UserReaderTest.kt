@@ -16,31 +16,18 @@ internal class UserReaderTest : AnnotationSpec() {
         val uuid = 111L
         val invalidUUid = 112L
         val userRepository = mockk<UserRepository>()
-        val userReader = UserReader(userRepository)
+        val userValidator = mockk<UserValidator>()
+        val userReader = UserReader(userRepository, userValidator = userValidator)
 
         val user = User(balance = 50, name = "jaewon")
         user.uuid = invalidUUid
 
         every { userRepository.findByUuid(uuid) } returns user
-
+        every { userValidator.checkUuid(reqUUID = uuid, user = user) } throws InvalidAuthenticationException()
         // When, Then
         shouldThrow<InvalidAuthenticationException> {
             userReader.read(uuid = uuid)
         }
     }
 
-    @Test
-    fun `사용자가 조회되지 않을 경우 예외 발생`() {
-        // Given
-        val uuid = 111L
-        val userRepository = mockk<UserRepository>()
-        val userReader = UserReader(userRepository)
-
-        every { userRepository.findByUuid(uuid) } returns null
-
-        // When, Then
-        shouldThrow<InvalidAuthenticationException> {
-            userReader.read(uuid = uuid)
-        }
-    }
 }

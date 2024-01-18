@@ -8,12 +8,13 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
 @Component
-class BookingProcessor(val bookingReader: BookingReader) {
+class BookingProcessor(val bookingReader: BookingReader, val userReader: UserReader) {
 
     private val log = KotlinLogging.logger("BookingProcessor")
     @Transactional
     fun reserve(seatId : Int, bookingDate : String, uuid : Long) : Booking {
         try {
+            userReader.read(uuid = uuid)
             bookingReader.read(seatId = seatId, bookingDate = bookingDate).let { bookings ->
                 if(bookings.size != 1) {
                     throw IllegalArgumentException()

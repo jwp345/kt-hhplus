@@ -56,6 +56,7 @@ dependencies {
     // 프로퍼티 제어 in xml
     implementation("org.codehaus.janino:janino:3.1.7")
     implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation("com.github.ben-manes.caffeine:caffeine:3.0.6")
 }
 
 tasks.withType<KotlinCompile> {
