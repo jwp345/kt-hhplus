@@ -27,8 +27,6 @@ class WaitTokenFilter(private val tokenProvider: TokenProvider)
         if (token != null && tokenProvider.validateToken(token)) {
             val authentication = tokenProvider.getAuthentication(token)
             SecurityContextHolder.getContext().authentication = authentication
-        } else {
-            log.warn("Token authentication error Token : {}", token)
         }
         filterChain.doFilter(request, response)
     }

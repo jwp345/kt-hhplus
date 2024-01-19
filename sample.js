@@ -6,7 +6,7 @@ export const options = {
     // discardResponseBodies: true,
     // see https://k6.io/docs/using-k6/options/#stages
 
-    vus: 1,
+    vus: 1000,
     duration: '1s'
     // stages: [
     //     {duration: '10s', target: 10} 
@@ -52,11 +52,9 @@ function login() {
 }
 
 function findSeat(authHeader) {
-    const url = 'http://localhost:8080/api/v1/booking/dates/available';
-    const params = {
-        'seatId' : 1
-    };
-    let response = http.get(url, authHeader, params).json();
+    const url = 'http://localhost:8080/api/v1/booking/dates/available?seatId=1';
+
+    let response = http.get(url, authHeader);
 
     check(response, {
         'is status 200': (r) => r.status === 200,
