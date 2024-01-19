@@ -20,7 +20,7 @@ spring:
 
 waitToken:
   set:
-    max_size: 8000
+    max_size: 100
   auth:
     name: auth-booking
 

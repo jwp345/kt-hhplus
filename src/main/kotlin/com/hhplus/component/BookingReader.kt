@@ -33,7 +33,7 @@ class BookingReader(val bookingRepository: BookingRepository) {
     }
 
     fun read(status : BookingStatusCode) : List<Booking> {
-        return bookingRepository.findByStatus(bookingStatusCode = status.code)
+        return bookingRepository.findByStatus(availableCode = status.code)
     }
 
     private fun checkBookingDate(bookingDate: String): LocalDateTime {

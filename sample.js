@@ -20,13 +20,14 @@ export const options = {
 };
  
 export default function() {
-    const authHeader = login();
-    findSeat(authHeader);
+    // const authHeader =
+    login();
+    // findSeat(authHeader);
     sleep(1);
 }
 
 function login() {
-    let userId = 1
+    let userId = __VU
     const url = 'http://localhost:8080/api/v1/token';
     const payload = JSON.stringify({
        uuid: userId

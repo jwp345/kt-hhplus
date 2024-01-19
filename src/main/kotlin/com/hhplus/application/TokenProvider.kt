@@ -20,6 +20,7 @@ import java.io.ObjectOutputStream
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 @Service
 class TokenProvider(val waitQueueRepository: WaitQueueRepository, val validWaitTokenRepository: ValidWaitTokenRepository,
@@ -40,7 +41,7 @@ class TokenProvider(val waitQueueRepository: WaitQueueRepository, val validWaitT
                 uuid = uuid, order = orderCounterRepository.incrementAndGet(), createAt = createAt
             ).let { token ->
                 if (validWaitTokenRepository.getSize() <= validTokenMaxsize.toInt()) {
-                    validWaitTokenRepository.add(token)
+                    validWaitTokenRepository.add(token = token, ttl = 10, timeUnit = TimeUnit.SECONDS)
                 } else {
                     waitQueueRepository.add(token)
                 }

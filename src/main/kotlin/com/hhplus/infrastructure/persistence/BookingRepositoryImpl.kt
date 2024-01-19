@@ -27,5 +27,5 @@ interface BookingRepositoryImpl : JpaRepository<Booking, Long>, BookingRepositor
         this.save(booking)
     }
 
-    override fun findByStatus(bookingStatusCode: Int) : List<Booking>
+    override fun findByStatus(availableCode: Int) : List<Booking>
 }

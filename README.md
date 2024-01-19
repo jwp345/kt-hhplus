@@ -3,7 +3,6 @@
 + 할 일들 List up
   + 밸리데이션 어노테이션으로 빼기
   + 일관성을 위해 booking date db 컬럼 LocalDateTime로 변경 하기
-  + 로그 형식 {traceId: ...} 같이 형식 변경해서 사용하기
   + 테스트 코드 redis 초기화 방안 고민하기
   + 추후 도커 이미지 등을 위해 테스트 컨네이너 등을 사용하여 로컬이 아닌 테스트를 위한 환경 구성하기
   + 예약 이력도 추후 적재 할 지 고민
@@ -45,6 +44,7 @@
     + 트랜잭션 분리와 결제 이력이 실패 해도 결제를 위한 트랜잭션에는 영향을 미치지 않도록 비동기 TransactionalEventListener를 사용하여 구현
   + redisson 라이브러리를 사용할 경우 종속적인 클래스 정보가 포함된 걸 어떻게 종속적이지 않게 바꿀 수 있을지 고민
     + https://zorba91.tistory.com/352 참고하여 codec 설정 변경
+  + redisson 을 이용하여 키 만료 이벤트 발신 및 수신
 
 + 알게 된 점
   + given(ticketRepository.getLockAndReserveMap().mapCache.contains(any(ConcertInfo::class.java)))
@@ -56,3 +56,4 @@
 
 참조: https://www.baeldung.com/java-generating-time-based-uuids
 <br>https://ssdragon.tistory.com/162
+<br>https://velog.io/@leui9179/%EA%B2%BD%EB%A7%A4-%EC%A2%85%EB%A3%8C-%EC%B2%98%EB%A6%AC-Spring-batch%EC%97%90%EC%84%9C-Redis%EB%A1%9C-%EB%A6%AC%ED%8C%A9%ED%86%A0%EB%A7%81-%ED%95%98%EA%B8%B0-vtdzd87j

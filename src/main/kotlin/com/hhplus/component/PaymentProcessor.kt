@@ -7,7 +7,6 @@ import com.hhplus.domain.exception.FailedFindBookingException
 import com.hhplus.domain.exception.NotEnoughMoneyException
 import com.hhplus.domain.repository.BookingRepository
 import com.hhplus.domain.repository.ValidWaitTokenRepository
-import com.hhplus.domain.repository.WaitQueueRepository
 import com.hhplus.infrastructure.security.WaitToken
 import com.hhplus.presentation.booking.BookingStatusCode
 import com.hhplus.presentation.payment.ConcertInfo
@@ -17,9 +16,9 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
 @Component
-class PaymentProcessor(val userReader: UserReader, val waitQueueRepository: WaitQueueRepository,
-                       val validWaitTokenRepository: ValidWaitTokenRepository, val bookingRepository: BookingRepository,
-    val applicationEventPublisher: ApplicationEventPublisher) {
+class PaymentProcessor(val userReader: UserReader, val validWaitTokenRepository: ValidWaitTokenRepository,
+                       val bookingRepository: BookingRepository,
+                       val applicationEventPublisher: ApplicationEventPublisher) {
 
     @Transactional
     fun pay(concertInfos: List<ConcertInfo>, waitToken : WaitToken) : List<Payment> {
@@ -58,9 +57,7 @@ class PaymentProcessor(val userReader: UserReader, val waitQueueRepository: Wait
     private fun payTotals(user : User, totalPrice : Long, waitToken: WaitToken, payments : MutableList<Payment>) {
         checkUserEnoughMoney(price = totalPrice, balance = user.balance)
         user.balance -= totalPrice
-
-        validWaitTokenRepository.remove(token = waitToken)
-        waitQueueRepository.pop()?.let { validWaitTokenRepository.add(token = it) }
+        validWaitTokenRepository.expireToken(token = waitToken)
         applicationEventPublisher.publishEvent(PaymentEvent(payments = payments))
     }
 

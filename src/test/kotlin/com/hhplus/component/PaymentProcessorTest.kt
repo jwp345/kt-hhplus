@@ -2,7 +2,6 @@ package com.hhplus.component
 
 import com.hhplus.domain.entity.User
 import com.hhplus.domain.exception.FailedFindBookingException
-import com.hhplus.domain.exception.FailedPaymentException
 import com.hhplus.domain.exception.NotEnoughMoneyException
 import com.hhplus.domain.repository.BookingRepository
 import com.hhplus.domain.repository.ValidWaitTokenRepository
@@ -23,13 +22,11 @@ internal class PaymentProcessorTest : AnnotationSpec(){
     private val validWaitTokenRepository : ValidWaitTokenRepository = mockk<ValidWaitTokenRepository>()
     private val bookingRepository : BookingRepository = mockk<BookingRepository>()
     private val applicationEventPublisher = mockk<ApplicationEventPublisher>()
-    private val waitQueueRepository = mockk<WaitQueueRepository>()
     private val paymentProcessor = PaymentProcessor(
             userReader = userReader,
             bookingRepository = bookingRepository,
         validWaitTokenRepository = validWaitTokenRepository,
-        applicationEventPublisher = applicationEventPublisher,
-        waitQueueRepository = waitQueueRepository
+        applicationEventPublisher = applicationEventPublisher
         )
 
     @Test

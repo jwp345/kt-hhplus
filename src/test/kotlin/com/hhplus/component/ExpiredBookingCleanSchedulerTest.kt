@@ -76,6 +76,8 @@ internal class ExpiredBookingCleanSchedulerTest {
             now = LocalDateTime.now())).isTrue()
     }
 
+
+    // 트랜잭션 잡고 있게 변경해보기
     @Test
     fun `결제와 충돌날 경우`() {
         /* given */
@@ -88,7 +90,7 @@ internal class ExpiredBookingCleanSchedulerTest {
         userRepository.save(user = user)
         val waitToken = WaitToken(uuid = user.uuid!!, order = 1, createAt = LocalDateTime.now().toEpochSecond(
             ZoneOffset.UTC))
-        validWaitTokenRepository.add(waitToken)
+        validWaitTokenRepository.add(token = waitToken, ttl = 1, timeUnit = TimeUnit.HOURS)
 
         // when
         CompletableFuture.allOf(

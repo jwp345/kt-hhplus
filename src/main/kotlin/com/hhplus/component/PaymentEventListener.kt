@@ -14,7 +14,7 @@ class PaymentEventListener(val paymentRepository: PaymentRepository) {
     /* TODO : saveAll() 메소드가 안먹는 이유 찾기 */
     @Async
     @TransactionalEventListener
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+//    @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun savePayments(paymentEvent: PaymentEvent) {
         for(payment : Payment in paymentEvent.payments) {
             paymentRepository.save(payment)

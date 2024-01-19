@@ -17,6 +17,7 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
 @SpringBootTest
@@ -63,7 +64,7 @@ class PaymentFacadeTest {
         uuid = user.uuid!!
         waitToken = WaitToken(uuid = uuid, order = 1, createAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))
         waitQueueRepository.add(token = WaitToken(uuid = uuid, order = 2, createAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)))
-        validWaitTokenRepository.add(token = waitToken)
+        validWaitTokenRepository.add(token = waitToken, ttl = 1, timeUnit = TimeUnit.HOURS)
         val booking = Booking(seatId = seatId, bookingDate = bookingDate, status = BookingStatusCode.RESERVED, price = 5000)
         booking.userUuid = uuid
         bookingRepository.save(booking)

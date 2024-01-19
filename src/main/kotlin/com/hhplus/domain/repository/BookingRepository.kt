@@ -13,5 +13,5 @@ interface BookingRepository {
 
     fun save(booking : Booking)
 
-    fun findByStatus(bookingStatusCode : Int) : List<Booking>
+    fun findByStatus(availableCode : Int) : List<Booking>
 }
