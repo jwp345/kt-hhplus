@@ -56,4 +56,4 @@
 
 참조: https://www.baeldung.com/java-generating-time-based-uuids
 <br>https://ssdragon.tistory.com/162
-<br>https://velog.io/@leui9179/%EA%B2%BD%EB%A7%A4-%EC%A2%85%EB%A3%8C-%EC%B2%98%EB%A6%AC-Spring-batch%EC%97%90%EC%84%9C-Redis%EB%A1%9C-%EB%A6%AC%ED%8C%A9%ED%86%A0%EB%A7%81-%ED%95%98%EA%B8%B0-vtdzd87j
+<br>https://github.com/redisson/redisson/wiki/7.-distributed-collections
