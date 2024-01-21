@@ -45,11 +45,11 @@ function login() {
         'is status 200': (r) => r.status === 200,
       });
 
-    return {
-        headers: {
-            'X-WAIT-TOKEN': `${response.json('data.token')}`,
-        },
-    };
+    // return {
+    //     headers: {
+    //         'X-WAIT-TOKEN': `${response.json('data.token')}`,
+    //     },
+    // };
 }
 
 function findSeat(authHeader) {

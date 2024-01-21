@@ -22,17 +22,25 @@
     </included>
 
     <springProfile name="dev">
+        <appender name="ASYNC_STDOUT" class="ch.qos.logback.classic.AsyncAppender">
+            <queueSize>10000</queueSize>
+            <maxFlushTime>0</maxFlushTime>
+            <appender-ref ref="STDOUT"/>
+        </appender>
+        <root level="INFO">
+            <appender-ref ref="ASYNC_STDOUT"/>
+        </root>
         <logger additivity="false" level="INFO" name="com.hhplus">
             <appender-ref ref="THREAD_CONSOLE"/>
         </logger>
 
-        <!-- Bootstrap class file -->
-        <logger additivity="false" level="INFO" name="com.hhplus.HhplusApplicationKt">
-            <appender-ref ref="CONSOLE"/>
-        </logger>
+<!--        &lt;!&ndash; Bootstrap class file &ndash;&gt;-->
+<!--        <logger additivity="false" level="INFO" name="com.hhplus.HhplusApplicationKt">-->
+<!--            <appender-ref ref="CONSOLE"/>-->
+<!--        </logger>-->
 
-        <root level="INFO">
-            <appender-ref ref="CONSOLE"/>
-        </root>
+<!--        <root level="INFO">-->
+<!--            <appender-ref ref="CONSOLE"/>-->
+<!--        </root>-->
     </springProfile>
 </configuration>

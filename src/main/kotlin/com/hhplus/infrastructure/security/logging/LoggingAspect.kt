@@ -25,8 +25,6 @@ class LoggingAspect {
         val parameterValues = joinPoint.args
 
         return parameterNames.zip(parameterValues)
-            .filter { it.second != null }
-            .map { "${it.first}=${it.second}" }
-            .joinToString(" ")
+            .filter { it.second != null }.joinToString(" ") { "${it.first}=${it.second}" }
     }
 }
