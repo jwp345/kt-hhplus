@@ -77,7 +77,6 @@ internal class ExpiredBookingCleanSchedulerTest {
     }
 
 
-    // 트랜잭션 잡고 있게 변경해보기
     @Test
     fun `결제와 충돌날 경우`() {
         /* given */
@@ -97,7 +96,8 @@ internal class ExpiredBookingCleanSchedulerTest {
             CompletableFuture.runAsync { paymentProcessor.pay(concertInfos = listOf(ConcertInfo(date = "2023-11-12 17:00", seatId = 1),
                 ConcertInfo(seatId = 2, date = "2023-11-13 18:00"), ConcertInfo(seatId = 3, date = "2023-11-14 17:40")),
                 waitToken = waitToken
-            ) },
+            )
+                Thread.sleep(1000)},
             CompletableFuture.runAsync { expiredBookingCleanScheduler.cleanExpiredBooking() }
         ).exceptionally { throwable : Throwable ->
             e.set(throwable.cause)
