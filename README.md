@@ -57,3 +57,4 @@
 참조: https://www.baeldung.com/java-generating-time-based-uuids
 <br>https://ssdragon.tistory.com/162
 <br>https://github.com/redisson/redisson/wiki/7.-distributed-collections
+<br>https://stackoverflow.com/questions/4594229/mysql-integer-vs-datetime-index
