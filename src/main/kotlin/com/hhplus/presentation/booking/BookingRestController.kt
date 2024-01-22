@@ -2,6 +2,7 @@ package com.hhplus.presentation.booking
 
 import com.hhplus.presentation.ApiResponse
 import com.hhplus.application.BookingFacade
+import com.hhplus.component.DateTimeParser
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.GetMapping
@@ -11,16 +12,17 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @RestController
 @RequestMapping("/api/v1/booking")
-class BookingRestController (val bookingFacade: BookingFacade){
+class BookingRestController (val bookingFacade: BookingFacade, val dateTimeParser: DateTimeParser){
 
     @GetMapping("/dates/available")
     fun findDatesAvailable(@RequestParam(required = true) seatId: Int) : ApiResponse<DatesAvailableResponse?> {
         return ApiResponse.ok(DatesAvailableResponse(
             bookingFacade.findDatesAvailable(seatId = seatId).stream()
-            .map { booking -> booking.bookingDate }
+            .map { booking -> dateTimeParser.dateTimeToString(booking.bookingDate) }
             .toList()))
     }
 
@@ -40,7 +42,8 @@ class BookingRestController (val bookingFacade: BookingFacade){
             ApiResponse.ok(
                 ReservationResponse(
                     seatId = booking.seatId, reservedDate = LocalDateTime.now(),
-                    uuid = uuid, bookingDate = booking.bookingDate
+                    uuid = uuid,
+                    bookingDate = dateTimeParser.dateTimeToString(booking.bookingDate)
                 )
             )
         }

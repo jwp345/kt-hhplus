@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito.given
 
 import org.mockito.Mockito.mock
+import java.time.LocalDateTime
 
 internal class BookingProcessorTest {
 
@@ -16,24 +17,25 @@ internal class BookingProcessorTest {
     private val bookingProcessor = BookingProcessor(bookingReader, userReader = userReader)
 
     val seatId : Int = 1
-    val bookingDate : String = "2023-11-20 11:15"
+    val bookingDate : LocalDateTime = LocalDateTime.now()
+    val date : String = bookingDate.toString()
 
     @Test
     fun `예약 정보가 0개나 1개 보다 많이 조회되면 예외를 출력한다`() {
-        given(bookingReader.read(seatId = seatId, bookingDate = bookingDate)).willReturn(listOf(
+        given(bookingReader.read(seatId = seatId, bookingDate = date)).willReturn(listOf(
             Booking(
                 seatId = 1,
-                bookingDate = "date",
+                bookingDate = bookingDate,
                 status = BookingStatusCode.AVAILABLE,
                 price = 100L
             ), Booking(seatId = 2,
-                bookingDate = "date",
+                bookingDate = bookingDate,
                 status = BookingStatusCode.AVAILABLE,
                 price = 100L)
         ))
         given(userReader.read(uuid = 1)).willReturn(null)
         assertThrows(FailedReserveException::class.java) {
-            bookingProcessor.reserve(seatId = seatId, bookingDate = bookingDate, uuid = 1)
+            bookingProcessor.reserve(seatId = seatId, bookingDate = date, uuid = 1)
         }
 
         assertThrows(FailedReserveException::class.java) {

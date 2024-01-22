@@ -50,6 +50,9 @@ internal class ExpiredBookingCleanSchedulerTest {
     @Autowired
     private lateinit var userRepository: UserRepository
 
+    @Autowired
+    private lateinit var dateTimeParser: DateTimeParser
+
     @Test
     fun `스케줄러는 1분마다 돌아야 한다`() {
         await()
@@ -59,15 +62,20 @@ internal class ExpiredBookingCleanSchedulerTest {
 
     @Test
     fun `스케줄러가 돌면 5분이 지난 예약 정보를 사용가능으로 변경해야 한다`() {
+        // given
         auditingHandler.setDateTimeProvider { Optional.of(LocalDateTime.now().minusMinutes(5)) }
 
-        Booking(seatId = 1, bookingDate = "2023-11-20 11:15", status = BookingStatusCode.RESERVED, price = 50)
+        // when
+        val booking = Booking(seatId = 1, bookingDate = dateTimeParser.stringToDateTime("2023-11-20 11:15"), status = BookingStatusCode.RESERVED, price = 50)
             .apply {
                 bookingRepository.save(this)
             }
+
+        // then
         assertThat(bookingRepository.findByStatus(BookingStatusCode.RESERVED.code)[0].modifiedAt).isBefore(LocalDateTime.now().minusMinutes(5))
         expiredBookingCleanScheduler.cleanExpiredBooking()
-        assert(bookingRepository.findByStatus(BookingStatusCode.AVAILABLE.code).size == 1)
+        assertThat(bookingRepository.findBySeatIdAndBookingDateAndStatus(seatId = 1, bookingDate = dateTimeParser.stringToDateTime("2023-11-20 11:15"), availableCode =
+        BookingStatusCode.AVAILABLE.code).size).isEqualTo(1)
     }
 
     @Test
@@ -82,9 +90,9 @@ internal class ExpiredBookingCleanSchedulerTest {
         /* given */
         auditingHandler.setDateTimeProvider { Optional.of(LocalDateTime.now().minusMinutes(6)) }
         val e = AtomicReference<Throwable?>()
-        bookingRepository.save(Booking(seatId = 1, bookingDate = "2023-11-12 17:00", price = 5000, status = BookingStatusCode.RESERVED))
-        bookingRepository.save(Booking(seatId = 2, bookingDate = "2023-11-13 18:00", price = 3000, status = BookingStatusCode.RESERVED))
-        bookingRepository.save(Booking(seatId = 3, bookingDate = "2023-11-14 17:40", price = 4000, status = BookingStatusCode.RESERVED))
+        bookingRepository.save(Booking(seatId = 1, bookingDate = dateTimeParser.stringToDateTime("2023-11-12 17:00"), price = 5000, status = BookingStatusCode.RESERVED))
+        bookingRepository.save(Booking(seatId = 2, bookingDate = dateTimeParser.stringToDateTime("2023-11-13 18:00"), price = 3000, status = BookingStatusCode.RESERVED))
+        bookingRepository.save(Booking(seatId = 3, bookingDate = dateTimeParser.stringToDateTime("2023-11-14 17:40"), price = 4000, status = BookingStatusCode.RESERVED))
         val user = User(name = "Hello", balance = 1000000)
         userRepository.save(user = user)
         val waitToken = WaitToken(uuid = user.uuid!!, order = 1, createAt = LocalDateTime.now().toEpochSecond(

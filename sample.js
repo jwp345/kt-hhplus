@@ -22,7 +22,7 @@ export const options = {
 export default function() {
     const authHeader = {
         headers: {
-            'X-WAIT-TOKEN': `rO0ABXNyACxjb20uaGhwbHVzLmluZnJhc3RydWN0dXJlLnNlY3VyaXR5LldhaXRUb2tlbudSlW4gg/ttAgADSgAIY3JlYXRlQXRKAAVvcmRlckoABHV1aWR4cAAAAABlroDdAAAAAAAABxUAAAAAAAACuQ==`,
+            'X-WAIT-TOKEN': `rO0ABXNyACxjb20uaGhwbHVzLmluZnJhc3RydWN0dXJlLnNlY3VyaXR5LldhaXRUb2tlbudSlW4gg/ttAgADSgAIY3JlYXRlQXRKAAVvcmRlckoABHV1aWR4cAAAAABlrp43AAAAAAAAA6AAAAAAAAABqg==`,
         }
     }
     // login();
@@ -69,7 +69,7 @@ function findSeat(authHeader) {
 
 function findByDate(authHeader) {
     const dateParameter = '2024-10-25 23:28';
-    const url = `http://localhost:8080/api/v1/booking/seats/available?date=${dateParameter}`;
+    const url = 'http://localhost:8080/api/v1/booking/seats/available?date=2024-10-25%2023%3A28';
 
     let response = http.get(url, authHeader);
 

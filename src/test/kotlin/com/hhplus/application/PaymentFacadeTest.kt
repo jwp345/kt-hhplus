@@ -1,5 +1,6 @@
 package com.hhplus.application
 
+import com.hhplus.component.DateTimeParser
 import com.hhplus.domain.entity.Booking
 import com.hhplus.domain.entity.User
 import com.hhplus.domain.repository.*
@@ -44,6 +45,9 @@ class PaymentFacadeTest {
     @Autowired
     lateinit var paymentRepository: PaymentRepository
 
+    @Autowired
+    lateinit var dateTimeParser: DateTimeParser
+
     lateinit var user : User
 
     lateinit var concertInfo: ConcertInfo
@@ -65,7 +69,7 @@ class PaymentFacadeTest {
         waitToken = WaitToken(uuid = uuid, order = 1, createAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))
         waitQueueRepository.add(token = WaitToken(uuid = uuid, order = 2, createAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)))
         validWaitTokenRepository.add(token = waitToken, ttl = 1, timeUnit = TimeUnit.HOURS)
-        val booking = Booking(seatId = seatId, bookingDate = bookingDate, status = BookingStatusCode.RESERVED, price = 5000)
+        val booking = Booking(seatId = seatId, bookingDate = dateTimeParser.stringToDateTime(bookingDate), status = BookingStatusCode.RESERVED, price = 5000)
         booking.userUuid = uuid
         bookingRepository.save(booking)
     }
@@ -79,9 +83,9 @@ class PaymentFacadeTest {
     @Order(3)
     @Test
     fun `결제를 하면 Booking 테이블에 상태가 반영 되어야 한다`() {
-        assertEquals(bookingRepository.findBySeatIdAndBookingDateAndStatusAndUserUuid(seatId = seatId, bookingDate = bookingDate,
+        assertEquals(bookingRepository.findBySeatIdAndBookingDateAndStatusAndUserUuid(seatId = seatId, bookingDate = dateTimeParser.stringToDateTime(bookingDate),
             availableCode = BookingStatusCode.CONFIRMED.code, userUuid = uuid).size, 1)
-        assertEquals(bookingRepository.findBySeatIdAndBookingDateAndStatusAndUserUuid(seatId = seatId, bookingDate = bookingDate,
+        assertEquals(bookingRepository.findBySeatIdAndBookingDateAndStatusAndUserUuid(seatId = seatId, bookingDate = dateTimeParser.stringToDateTime(bookingDate),
             availableCode = BookingStatusCode.AVAILABLE.code, userUuid = uuid).size, 0)
     }
 

@@ -21,15 +21,15 @@ class BookingReader(val bookingRepository: BookingRepository) {
 
     fun read(bookingDate: String) : List<Booking> {
         checkBookingDate(bookingDate = bookingDate)
-        return bookingRepository.findByBookingDateAndStatus(bookingDate = bookingDate,
+        return bookingRepository.findByBookingDateAndStatus(bookingDate = checkBookingDate(bookingDate = bookingDate),
             availableCode = BookingStatusCode.AVAILABLE.code)
     }
 
     fun read(bookingDate: String, seatId: Int) : List<Booking> {
         checkSeatId(seatId = seatId)
-        checkBookingDate(bookingDate = bookingDate)
+
         return bookingRepository.findBySeatIdAndBookingDateAndStatus(seatId = seatId,
-            bookingDate = bookingDate, availableCode = BookingStatusCode.AVAILABLE.code)
+            bookingDate = checkBookingDate(bookingDate = bookingDate), availableCode = BookingStatusCode.AVAILABLE.code)
     }
 
     fun read(status : BookingStatusCode) : List<Booking> {

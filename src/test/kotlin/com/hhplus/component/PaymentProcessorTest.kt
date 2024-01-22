@@ -5,7 +5,6 @@ import com.hhplus.domain.exception.FailedFindBookingException
 import com.hhplus.domain.exception.NotEnoughMoneyException
 import com.hhplus.domain.repository.BookingRepository
 import com.hhplus.domain.repository.ValidWaitTokenRepository
-import com.hhplus.domain.repository.WaitQueueRepository
 import com.hhplus.infrastructure.security.WaitToken
 import com.hhplus.presentation.booking.BookingStatusCode
 import com.hhplus.presentation.payment.ConcertInfo
@@ -16,6 +15,7 @@ import io.mockk.mockk
 import org.springframework.context.ApplicationEventPublisher
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 internal class PaymentProcessorTest : AnnotationSpec(){
     private val userReader : UserReader = mockk<UserReader>()
@@ -41,7 +41,7 @@ internal class PaymentProcessorTest : AnnotationSpec(){
         val user = User(name = "name", balance = 1000)
         val concertInfo = ConcertInfo(seatId = 1, date = "2023-11-20 11:20")
         every { userReader.read(1) }.returns(user)
-        every { bookingRepository.findBySeatIdAndBookingDateAndStatusAndUserUuid(bookingDate = concertInfo.date,
+        every { bookingRepository.findBySeatIdAndBookingDateAndStatusAndUserUuid(bookingDate = LocalDateTime.parse(concertInfo.date, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
             seatId = concertInfo.seatId, availableCode = BookingStatusCode.RESERVED.code, userUuid = 1) }.returns(listOf())
 
         shouldThrow<FailedFindBookingException> {

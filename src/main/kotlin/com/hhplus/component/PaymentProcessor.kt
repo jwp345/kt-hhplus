@@ -14,6 +14,8 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Component
 class PaymentProcessor(val userReader: UserReader, val validWaitTokenRepository: ValidWaitTokenRepository,
@@ -47,7 +49,7 @@ class PaymentProcessor(val userReader: UserReader, val validWaitTokenRepository:
 
     private fun findBooking(concertInfo: ConcertInfo, uuid : Long) : Booking {
         return bookingRepository.findBySeatIdAndBookingDateAndStatusAndUserUuid(
-            bookingDate = concertInfo.date,
+            bookingDate = LocalDateTime.parse(concertInfo.date, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
             seatId = concertInfo.seatId,
             availableCode = BookingStatusCode.RESERVED.code,
             userUuid = uuid
