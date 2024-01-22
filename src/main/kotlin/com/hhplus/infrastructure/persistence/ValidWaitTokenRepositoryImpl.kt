@@ -7,6 +7,7 @@ import com.hhplus.infrastructure.security.WaitToken
 import org.redisson.api.RMapCache
 import org.redisson.api.RedissonClient
 import org.redisson.api.map.event.EntryExpiredListener
+import org.redisson.codec.TypedJsonJacksonCodec
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 import java.util.concurrent.TimeUnit
@@ -18,7 +19,7 @@ class ValidWaitTokenRepositoryImpl(
     private val applicationEventPublisher: ApplicationEventPublisher
 ) : ValidWaitTokenRepository {
 
-    private val validTokenMap: RMapCache<Long, WaitToken> = redissonClient.getMapCache(redisConfig.validMapName)
+    private val validTokenMap: RMapCache<Long, WaitToken> = redissonClient.getMapCache(redisConfig.validMapName, TypedJsonJacksonCodec(Long::class.java, WaitToken::class.java))
 
     init {
         validTokenMap.addListener(EntryExpiredListener<Long, WaitToken> {

@@ -23,8 +23,8 @@ class RedisConfig {
 
     lateinit var host: String
     var port: Int = 0
-    final val reserveLockName : String = "reserve-seat-lock"
-    final val cacheReserveKey : String = "seat-reservation"
+//    final val reserveLockName : String = "reserve-seat-lock"
+//    final val cacheReserveKey : String = "seat-reservation"
     final val waitQueueName : String = "wait-queue"
     final val validMapName : String = "wait-token-map"
     final val orderCounterName : String = "order-counter"
@@ -35,7 +35,6 @@ class RedisConfig {
         config.useSingleServer()
             .setAddress("redis://$host:$port")
             .setDnsMonitoringInterval(-1)
-        config.codec = TypedJsonJacksonCodec(WaitToken::class.java)
         return Redisson.create(config)
     }
 

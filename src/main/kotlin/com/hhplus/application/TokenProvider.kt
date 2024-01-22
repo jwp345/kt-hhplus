@@ -41,7 +41,7 @@ class TokenProvider(val waitQueueRepository: WaitQueueRepository, val validWaitT
                 uuid = uuid, order = orderCounterRepository.incrementAndGet(), createAt = createAt
             ).let { token ->
                 if (validWaitTokenRepository.getSize() <= validTokenMaxsize.toInt()) {
-                    validWaitTokenRepository.add(token = token, ttl = 10, timeUnit = TimeUnit.SECONDS)
+                    validWaitTokenRepository.add(token = token, ttl = 1, timeUnit = TimeUnit.HOURS)
                 } else {
                     waitQueueRepository.add(token)
                 }
