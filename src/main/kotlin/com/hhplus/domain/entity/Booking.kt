@@ -30,5 +30,5 @@ final class Booking(seatId : Int, bookingDate : LocalDateTime, status : BookingS
     var userUuid : Long ?= null
 
     @Version
-    private val version : Int ?= null
+    private val version : Long ?= null
 }
