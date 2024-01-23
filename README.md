@@ -8,6 +8,7 @@
 + Redis(redisson)
 + AWS (ECS, ECR, Fargate - CI, CD/ CloudWatch, Lambda - Logging)
 + K6 (부하 테스트 툴)
++ Kotest, Junit5
 
 ### ERD
 ![erd](https://github.com/jwp345/kt-hhplus/assets/35333297/f911977a-9e07-4756-a7aa-7f9d5b4eb245)
@@ -30,7 +31,7 @@
 
 
 #### 할 일들 List up
-  + 그래들 빌드 시 코틀린 컴파일러가 돌아가서 메모리 많이 소요되는데 그래들 튜닝 필요
+  + 그래들 빌드 시 코틀린 컴파일러가 추가로 돌아가서 메모리 많이 소요되는데 그래들 튜닝 필요
   + redis로 캐싱 개선할 부분이 있을지?
   + 밸리데이션 어노테이션으로 빼기
   + 테스트 코드 redis 초기화 방안 고민하기
