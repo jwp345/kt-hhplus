@@ -1,14 +1,41 @@
-# kt-hhplus
-## 항해 플러스 3기 프로젝트 기록소
-+ 할 일들 List up
+# 항해 플러스 3기 프로젝트 기록소
+## 콘서트 예약 서비스
+### 활용 기술
++ Spring Boot 3.2.0
++ kotlin 1.9.20(jvm 17)
++ JPA
++ MariaDB
++ Redis(redisson)
++ AWS (ECS, ECR, Fargate - CI, CD/ CloudWatch, Lambda - Logging)
++ K6 (부하 테스트 툴)
+
+### ERD
+![erd](https://github.com/jwp345/kt-hhplus/assets/35333297/f911977a-9e07-4756-a7aa-7f9d5b4eb245)
+
+### Slack Webhook Url을 이용한 알림 전송
+![람다를 이용한 슬랙 error알람 보내기](https://github.com/jwp345/kt-hhplus/assets/35333297/748ab016-d41f-43d7-a8d3-71b33f0208dd)
+
+### 작업 내용
++ DDL 작성
++ API 설계 (Swagger로 작성하였으며 내용 보완을 하거나 RestDocs로 변경할 건지 고려 필요)
++ 서비스 로직 개발 (유저 토큰 발급 API, 예약 가능 날짜 / 좌석 API, 좌석 예약 요청 API, 잔액 충전 / 조회 API, 결제 API) 
++ 동시성 이슈 / 데이터 일관성 보장을 고려한 서비스 개발
+  + Booking 테이블 낙관적 Lock 활용
++ 비동기로 성능 향상
+  + 결재 이력적재 하기 위해 커밋된 이후 메시지 발행을 위한 TransactionalEventListener 활용
+  + 유효 토큰 만료를 위해 EventListener 활용
++ 커스텀 예외 생성 및 처리와 글로벌 예외 처리 핸들러 생성
++ 요청, 응답 로깅을 위한 Filter 생성 및 커스텀 
++ k6 부하 테스트 후, 성능을 위해 BookingDate 컬럼의 날짜 데이터 타입을 String -> DateTime 형식으로 변경 후 인덱스 생성으로 성능 개선
+
+
+#### 할 일들 List up
   + 그래들 빌드 시 코틀린 컴파일러가 돌아가서 메모리 많이 소요되는데 그래들 튜닝 필요
-  + redis로 캐싱 필요한 부분이 더 있나?
+  + redis로 캐싱 개선할 부분이 있을지?
   + 밸리데이션 어노테이션으로 빼기
   + 테스트 코드 redis 초기화 방안 고민하기
   + 추후 도커 이미지 등을 위해 테스트 컨네이너 등을 사용하여 로컬이 아닌 테스트를 위한 환경 구성하기
   + 예약 이력도 추후 적재 할 지 고민
-  + v1.5 예약 정보를 redisson 캐싱하는 방식으로 바꾸고, redis에서 먼저 조회한 애가 있으면 응답 보내거나 예외 보내서 db까지 조회가 안되도록 지금 event 발행하는 부분을 유효 토큰 대기열 ttl 만료시 pub-sub 방식으로?
-  + v2는 만약 redis같은 nosql을 못쓴다고할 때, rdb로만 구현하고 싶을 경우 어떻게 할 건지? 그렇다면 만료시간을 정해두고 들어오게 하는 방식으로 변경
   + v1:
     + redis를 대기열 구현할 때만 사용하며, 예약정보는 rdb에서 한번에 관리하고 낙관적락을 사용하여 동시성 이슈를 관리하며 따로 캐시는 안함
     + 예약정보는 redis로 관리를 안하는데 그 이유는 예약정보를 관리하려면 분산락을 사용하여야 하는데, 예약 정보를 조회하는데 락 획득 시도를 하는데 드는 비용이 더 들것같아서임
@@ -19,7 +46,7 @@
     + 현재 들어온 시간에 미리 정해둔 가중치(현재 사이클 수 * 수용할 수 있는 최대 인원 / 분당 처리량)를 더하여 유저에게 입장 시간을 부여한다.
       + 장점: 유저가 나갈 때 한 유저를 들어오게 안해도 되어 읽고 쓰기 등 부하도 줄임. 그리고 큐를 위해 nosql을 사용할 필요도 없어짐.
 
-+ 주요 고민들
+#### 주요 고민들
   + 동시성 문제를 위해 어떤 방법을 사용할 것인가?
     + Atomic Value or Synchronized : 인스턴스 확장될 경우 동시성 보장이 안됨
     + db의 낙관적락, 비관적 락 or 분산락
@@ -31,7 +58,7 @@
       + 따라서, 첫번째 컴포넌트로 timestamp 기반 UUID를 생성하여 성능을 최적화 시킬 것임
       + UUID v1, v6, v7이 시간 기반 UUID이나, 128비트로 용량 소모가 큼
     + 해결 방안
-      + hibernate tsid를 사용(id와 같이 사용하려 했으나 tsID를 사용할 경우 같이 못쓰는 문제가 있고 의미가 있을까싶어서 tsID만 사용하기로 결정)
+      + hibernate tsId를 사용(id와 같이 사용하려 했으나 tsID를 사용할 경우 같이 못쓰는 문제가 있고 의미가 있을까싶어서 tsId만 사용하기로 결정)
   + 기존 lettuce 라이브러리 대신 redisson 사용
     + redisson 을 이용하여 키 만료 이벤트 발신 및 수신을 위해 hash set 구조를 map 구조로 변경하여 사용(이벤트 리스너가 편리함)
   + 대기열 설계
@@ -47,13 +74,14 @@
     + https://zorba91.tistory.com/352 참고하여 codec 설정 변경
   
 
-+ 알게 된 점
+#### 알게 된 점
   + given(ticketRepository.getLockAndReserveMap().mapCache.contains(any(ConcertInfo::class.java)))
     .willReturn(true) -> 이렇게 junt + bdd로 테스트 할 경우 mapCache가 null을 반환해 테스트가 안되지만,
   + every { ticketRepository.getLockAndReserveMap().mapCache.contains(any()) } returns false -> mockk로 테스트 할 경우는 된다
   + 결론 : mockk가 좀 더 파워풀하다.
   + publishEvent()메소드를 사용하여 이벤트를 전송할 때 data class 말고 List<>() 같이 단순 래핑해서 보낼 시 제대로 메시지 리스너가 동작하지 않는다.
-
+  + Redisson 에서 hashset, hashmap 자료구조에서 TTL을 사용할 시 벌어지는 일
+    + 내부적으로 ScoredSortedSet이 생성되고 내부 스케줄러가 돌면서 해당 Score(만료 시간)순서대로 차례대로 제거한다.
 
 참조: https://www.baeldung.com/java-generating-time-based-uuids
 <br>https://ssdragon.tistory.com/162
