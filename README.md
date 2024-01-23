@@ -4,8 +4,10 @@
 + Spring Boot 3.2.0
 + kotlin 1.9.20(jvm 17)
 + JPA
++ Spring Security
 + MariaDB
 + Redis(redisson)
++ GitHub Action
 + AWS (ECS, ECR, Fargate - CI, CD/ CloudWatch, Lambda - Logging)
 + K6 (부하 테스트 툴)
 + Kotest, Junit5
@@ -19,12 +21,14 @@
 ### 작업 내용
 + DDL 작성
 + API 설계 (Swagger API Docs 제공)
-+ 서비스 로직 개발 (유저 토큰 발급 API, 예약 가능 날짜 / 좌석 API, 좌석 예약 요청 API, 잔액 충전 / 조회 API, 결제 API) 
++ 서비스 로직 개발 (유저 토큰 발급 API, 예약 가능 날짜 / 좌석 API, 좌석 예약 요청 API, 잔액 충전 / 조회 API, 결제 API)
++ 'X-WAIT-TOKEN' 헤더 생성 및 커스텀 토큰 생성
 + 동시성 이슈 / 데이터 일관성 보장을 고려한 서비스 개발
   + Booking 테이블 낙관적 Lock 활용
 + 비동기로 성능 향상
   + 결재 이력적재 하기 위해 커밋된 이후 메시지 발행을 위한 TransactionalEventListener 활용
   + 유효 토큰 만료를 위해 EventListener 활용
+  + 비동기 로깅으로 성능 향상
 + 커스텀 예외 생성 및 처리와 글로벌 예외 처리 핸들러 생성
 + 요청, 응답 로깅을 위한 Filter 생성 및 커스텀 
 + k6 부하 테스트 후, 성능을 위해 BookingDate 컬럼의 날짜 데이터 타입을 String -> DateTime 형식으로 변경 후 인덱스 생성으로 성능 개선
