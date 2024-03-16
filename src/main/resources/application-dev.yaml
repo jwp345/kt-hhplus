@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://localhost:3306/test
+    url: jdbc:mariadb://localhost:3307/test?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: root
     password: root
   data:
@@ -13,10 +13,14 @@ spring:
     hibernate:
       ddl-auto: create
     defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+      platform: mariadb
 
 waitToken:
   set:
-    max_size: 10000
+    max_size: 1000
   auth:
     name: auth-booking
 

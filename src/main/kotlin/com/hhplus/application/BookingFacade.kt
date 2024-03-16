@@ -20,4 +20,3 @@ class BookingFacade (val bookingReader: BookingReader, val bookingProcessor: Boo
         return bookingProcessor.reserve(seatId = seatId, bookingDate = bookingDate, uuid = uuid)
     }
 }
-

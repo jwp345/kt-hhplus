@@ -2,6 +2,7 @@ package com.hhplus.application
 
 import com.hhplus.domain.exception.FailedCreateTokenException
 import com.hhplus.domain.exception.InvalidAuthenticationException
+import com.hhplus.domain.repository.OrderCounterRepository
 import com.hhplus.domain.repository.ValidWaitTokenRepository
 import com.hhplus.domain.repository.WaitQueueRepository
 import com.hhplus.infrastructure.security.CustomUser
@@ -17,34 +18,32 @@ import org.springframework.stereotype.Service
 import java.io.ByteArrayOutputStream
 import java.io.ObjectOutputStream
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.*
-import java.util.concurrent.atomic.AtomicLong
+import java.util.concurrent.TimeUnit
 
 @Service
-class TokenProvider(val waitQueueRepository: WaitQueueRepository, val validWaitTokenRepository: ValidWaitTokenRepository) {
+class TokenProvider(val waitQueueRepository: WaitQueueRepository, val validWaitTokenRepository: ValidWaitTokenRepository,
+    val orderCounterRepository: OrderCounterRepository) {
 
     @Value("\${waitToken.set.max_size}")
     private lateinit var validTokenMaxsize : String
     @Value("\${waitToken.auth.name}")
     private lateinit var waitTokenAuth : String
-    private var order : AtomicLong = AtomicLong(0L)
+
 
     private val log = KotlinLogging.logger("TokenProvider")
 
-    /* TODO: 중복 토큰 생성 방지 및 처리율 제한 위해(따닥 방지위해) RateLimiter? */
     fun createToken(uuid: Long): String {
         try {
-            val createAt = LocalDateTime.now()
+            val createAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
             WaitToken(
-                uuid = uuid, order = this.order.incrementAndGet(), createAt = createAt
+                uuid = uuid, order = orderCounterRepository.incrementAndGet(), createAt = createAt
             ).let { token ->
                 if (validWaitTokenRepository.getSize() <= validTokenMaxsize.toInt()) {
-                    validWaitTokenRepository.add(token)
-                    log.info("Valid Wait Token Created : uuid : {}, order: {}, createAt : {}",
-                        uuid, order.get(), createAt)
+                    validWaitTokenRepository.add(token = token, ttl = 1, timeUnit = TimeUnit.HOURS)
                 } else {
                     waitQueueRepository.add(token)
-                    log.info("Store In WaitQueue : uuid : {}, order: {}, createAt : {}", uuid, order.get(), createAt)
                 }
 
                 return ByteArrayOutputStream().use { byteArrayOutputStream ->
@@ -67,7 +66,6 @@ class TokenProvider(val waitQueueRepository: WaitQueueRepository, val validWaitT
             .split(",")
             .map { SimpleGrantedAuthority(it) }
         val principal: UserDetails = CustomUser(token = token, userName = token.uuid.toString(), password = "", authorities = authorities)
-
 
             return UsernamePasswordAuthenticationToken(principal, "", authorities)
         } catch (e : Exception) {
