@@ -1,9 +1,9 @@
 package com.hhplus.domain.repository
 
 import com.hhplus.domain.entity.Payment
+import org.springframework.data.jpa.repository.JpaRepository
 
-interface PaymentRepository {
-    fun save(payment: Payment)
-
+interface PaymentRepository : JpaRepository<Payment, Long> {
     fun findByUuid(uuid : Long) : List<Payment>
+
 }
