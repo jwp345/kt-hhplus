@@ -1,5 +1,6 @@
 package com.hhplus.application
 
+import com.hhplus.component.DateTimeParser
 import com.hhplus.domain.entity.Booking
 import com.hhplus.domain.entity.User
 import com.hhplus.domain.repository.*
@@ -10,13 +11,14 @@ import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.extension.ExtendWith
-import org.redisson.api.RedissonClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
 @SpringBootTest
@@ -43,6 +45,9 @@ class PaymentFacadeTest {
     @Autowired
     lateinit var paymentRepository: PaymentRepository
 
+    @Autowired
+    lateinit var dateTimeParser: DateTimeParser
+
     lateinit var user : User
 
     lateinit var concertInfo: ConcertInfo
@@ -51,6 +56,7 @@ class PaymentFacadeTest {
 
     val bookingDate = "2023-11-20 15:30"
     val seatId = 1
+    var uuid : Long = 0
 
     @BeforeAll
     fun init() {
@@ -59,10 +65,13 @@ class PaymentFacadeTest {
         user = User(name = "jaewon", balance = 10_000)
         userRepository.save(user)
 
-        waitToken = WaitToken(uuid = user.uuid!!, order = 1, createAt = LocalDateTime.now())
-        waitQueueRepository.add(token = WaitToken(uuid = 123, order = 2, createAt = LocalDateTime.now()))
-        validWaitTokenRepository.add(token = waitToken)
-        bookingRepository.save(Booking(seatId = seatId, bookingDate = bookingDate, status = BookingStatusCode.RESERVED, price = 5000))
+        uuid = user.uuid!!
+        waitToken = WaitToken(uuid = uuid, order = 1, createAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))
+        waitQueueRepository.add(token = WaitToken(uuid = uuid, order = 2, createAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)))
+        validWaitTokenRepository.add(token = waitToken, ttl = 1, timeUnit = TimeUnit.HOURS)
+        val booking = Booking(seatId = seatId, bookingDate = dateTimeParser.stringToDateTime(bookingDate), status = BookingStatusCode.RESERVED, price = 5000)
+        booking.userUuid = uuid
+        bookingRepository.save(booking)
     }
 
     @Order(2)
@@ -74,22 +83,22 @@ class PaymentFacadeTest {
     @Order(3)
     @Test
     fun `결제를 하면 Booking 테이블에 상태가 반영 되어야 한다`() {
-        assertEquals(bookingRepository.findBySeatIdAndBookingDateAndStatus(seatId = seatId, bookingDate = bookingDate,
-            availableCode = BookingStatusCode.CONFIRMED.code).size, 1)
-        assertEquals(bookingRepository.findBySeatIdAndBookingDateAndStatus(seatId = seatId, bookingDate = bookingDate,
-            availableCode = BookingStatusCode.AVAILABLE.code).size, 0)
+        assertEquals(bookingRepository.findBySeatIdAndBookingDateAndStatusAndUserUuid(seatId = seatId, bookingDate = dateTimeParser.stringToDateTime(bookingDate),
+            availableCode = BookingStatusCode.CONFIRMED.code, userUuid = uuid).size, 1)
+        assertEquals(bookingRepository.findBySeatIdAndBookingDateAndStatusAndUserUuid(seatId = seatId, bookingDate = dateTimeParser.stringToDateTime(bookingDate),
+            availableCode = BookingStatusCode.AVAILABLE.code, userUuid = uuid).size, 0)
     }
 
     @Order(4)
     @Test
     fun `결제를 하면 유저의 잔액이 정상적으로 차감 되어야 한다`() {
-        userRepository.findByUuid(user.uuid!!)?.let { assertEquals(it.balance, 5000) }
+        userRepository.findByUuid(uuid)?.let { assertEquals(it.balance, 5000) }
     }
 
     @Order(5)
     @Test
     fun `커밋된 후 비동기로 실행된 리스너가 동작하여야 한다`() {
-        assertEquals(1, paymentRepository.findByUuid(user.uuid!!).size)
+        assertEquals(1, paymentRepository.findByUuid(uuid).size)
     }
 
     @Order(6)

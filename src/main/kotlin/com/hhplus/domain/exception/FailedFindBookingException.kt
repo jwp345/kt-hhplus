@@ -4,5 +4,5 @@ class FailedFindBookingException : FailedException() {
     override val code: Int
         get() = 5002
     override val message: String
-        get() = "결제가 이미 완료 된 예약이거나 유효하지 않은 예약 정보 입니다."
+        get() = "결제가 이미 완료 된 예약이거나 예약이 만료된 티켓이 포함되어 있습니다."
 }

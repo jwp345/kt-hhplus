@@ -10,7 +10,7 @@ class User(name: String, balance : Long) : BaseEntity() {
     @Id @Tsid
     var uuid : Long ?= null
 
-    @Column(name = "name", length = 16)
+    @Column(name = "name", length = 24)
     var name : String = name
 
     var balance : Long = balance

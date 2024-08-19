@@ -27,8 +27,6 @@ class WaitTokenFilter(private val tokenProvider: TokenProvider)
         if (token != null && tokenProvider.validateToken(token)) {
             val authentication = tokenProvider.getAuthentication(token)
             SecurityContextHolder.getContext().authentication = authentication
-        } else {
-            log.warn("Token authentication error Token : {}", token)
         }
         filterChain.doFilter(request, response)
     }
@@ -40,14 +38,14 @@ class WaitTokenFilter(private val tokenProvider: TokenProvider)
                     log.warn("Cannot Find Token In Header")
                     return null
                 }
-                val inputStream = ByteArrayInputStream(Base64.getDecoder().decode(token))
 
                 try {
+                    val inputStream = ByteArrayInputStream(Base64.getDecoder().decode(token))
                     ObjectInputStream(inputStream).use {
                         return it.readObject() as? WaitToken
                     }
                 } catch (e : Exception) {
-                    log.warn("Fail to Token Decode : {}", token)
+                    log.warn("Fail to Decode Token : {}", token.toString())
                     return null
                 }
             }
